@@ -12,17 +12,77 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var index = 0;
+const jobCount = 3;
+
 /**
- * Adds a random greeting to the page.
+ * Set innerHTML text in work experience section
  */
-function addRandomGreeting() {
-  const greetings =
-      ['Hello world!', '¡Hola Mundo!', '你好，世界！', 'Bonjour le monde!'];
+function setContent() {
+  const jobs = ['UI Development Intern @ Accenture', 'STEP Intern @ Google', 'STEP Intern @ Google'];
+  const dates = ['Sept. 2017 - Aug. 2018', 'Summer 2019', 'Summer 2020'];
+  const bulletPoints = [
+    [
+      'Used ReactJS to build a web app that assists with scheduling meetings and greets meeting attendees by name through Amazon Alexa and Microsoft’s FaceID API',
+      'Gained experience in NodeJS, Amazon Web Services, Git, and building Amazon Alexa Skills',
+      'Built UI for a web app intended for Accenture clients to interact with during Accenture presentations',
+      'Aided team working on a new computer aided dispatch system for the New York City Fire Department by doing research on technologies and writing code for proofs of concept',
+      'Assisted in ideation and creation of innovative demos at Accenture Liquid Studio, which rapidly develops demos and software'
+    ],
+    [
+      'Wrote SQL scripts to query datasets to collect and analyze data on bandwidth usage in Google data centers',
+      'Analyzed bandwidth usage data using Python to create a new guideline for bandwidth provisioning in Google data centers with the goal of optimizing resource utilization while minimizing cost',
+      'Wrote design document for project methodology',
+      'Committed code to Google’s codebase, which involved having my code reviewed by Google engineers and writing tests'
+    ],
+    [
+      'Will complete 4 starter projects and a capstone project utilizing Google APIs'
+    ]
+  ];
 
-  // Pick a random greeting.
-  const greeting = greetings[Math.floor(Math.random() * greetings.length)];
+  const job = document.getElementById('job');
+  const date = document.getElementById('date');
+  const summary = document.getElementById('summary');
+  const carouselContent = document.getElementById('carousel-content');
 
-  // Add it to the page.
-  const greetingContainer = document.getElementById('greeting-container');
-  greetingContainer.innerText = greeting;
+  carouselContent.style.opacity = 0;
+
+  /* Use setTimeout to make opacity change from 0 to 1
+  after 600ms as a transition */ 
+  setTimeout(function() {
+    job.innerHTML = jobs[index];
+    date.innerHTML = dates[index];
+    summary.innerHTML = '<ul>' + bulletPoints[index].map(function(point) {
+      return '<li>' + point + '</li>';
+    }).join('') + '</ul>';
+  }, 600);
+
+  setTimeout(function() {
+    carouselContent.style.opacity = 1;
+  }, 600);
 }
+
+/**
+ * Increment index or set to zero if reached end of jobs array
+ */
+function jobsNext() {
+  index = index + 1;
+  if (index === jobCount) {
+    index = 0;
+  }
+
+  setContent();
+}
+
+/**
+ * Decrement index or set to 2 if reached beginning of jobs array
+ */
+function jobsBack() {
+  index = index - 1;
+  if (index === -1) {
+    index = 2;
+  }
+
+  setContent();
+}
+
