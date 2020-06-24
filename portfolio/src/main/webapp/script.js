@@ -48,7 +48,7 @@ function setContent() {
   carouselContent.style.opacity = 0;
 
   /* Use setTimeout to make opacity change from 0 to 1
-  after 600ms as a transition */ 
+  after 600ms as a transition */
   setTimeout(function() {
     job.innerHTML = jobs[index];
     date.innerHTML = dates[index];

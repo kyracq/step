@@ -164,12 +164,12 @@ p {
 .profile-links,
 .profile-links a,
 .profile-links a:visited {
-    color: var(--accent-color);
-    float: right;
+  color: var(--accent-color);
+  float: right;
 }
 
 .profile-links i {
-    padding: 10px;
+  padding: 10px;
 }
 
 .experience-content {
@@ -183,7 +183,7 @@ p {
 }
 
 #summary {
-    padding: 0 20px 20px 0;
+  padding: 0 20px 20px 0;
 }
 
 .btn {
