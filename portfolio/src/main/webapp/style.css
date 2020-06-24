@@ -2,16 +2,17 @@
     font-size: 16px;
     font-family:'Roboto';
  
-    /* Color variables */
+    /* Variables */
     --text-primary: #b6b6b6;
     --text-secondary: #ececec;
-    --bg-primary: #23232e;
-    --bg-secondary: #141418;
+    --bg-primary: #29292e;
+    --bg-secondary: #212125;
+    --purple: #C486F2;
+    --transition-speed: 600ms;
 }
  
 body {
     color: black;
-    background-color: white;
     margin: 0;
     padding: 0;
 }
@@ -25,16 +26,27 @@ body::-webkit-scrollbar {
 body::-webkit-scrollbar-track {
     background: #6649b8;
 }
- 
+
 main {
-    margin-left: 5rem; /* 5x root font size */
+    margin-left: 5.25rem; /* 5.25x root font size */
 }
  
 .navbar {
-    width: 5rem; /* Set navbar width equal to left margin */
+    width: 5.25rem; /* Set navbar width equal to left margin */
     height: 100vh; /* 100% of window height */
     position: fixed; /* Stay fixed on scroll */
     background-color: var(--bg-primary);
+    transition: width 200ms ease;
+}
+
+/* Expand on hover */
+.navbar:hover {
+    width: 16rem;
+}
+
+/* Show text on hover */
+.navbar:hover .link-text {
+    display: block;
 }
  
 .navbar-nav{
@@ -45,6 +57,10 @@ main {
     flex-direction: column;
     align-items: center;
 }
+
+.nav-item {
+    width: 100%;
+}
  
 .nav-link {
     display: flex;
@@ -52,6 +68,14 @@ main {
     height: 5rem;
     color: var(--text-primary);
     text-decoration: none;
+    filter: grayscale(100%) opacity(0.7);
+    transition: var(--transition-speed);
+}
+
+.nav-link:hover {
+    filter: grayscale(0%) opacity(1);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
 }
  
 /* Only show icons, not text */
@@ -62,6 +86,64 @@ main {
  
 /* Format icons */
 .nav-link i {
-    min-width: 2rem;
     margin: 0 1.5rem;
+    font-size: 36px;
+    color: var(--purple);
+}
+
+.card-section section {
+    padding:150px;
+}
+
+.card{
+    margin: 100px;
+    margin-top: 0;
+    box-shadow:10px 10px 30px -10px rgba(0,0,0,0.5);
+    background-color: white;
+    padding:20px;
+    color: var(--bg-primary);
+    display: flex;
+}
+
+h1 {
+    font-size: 1.6em;
+    margin: 20px;
+    overflow: hidden;
+    text-align: center;
+    line-height: 1.6em;
+}
+
+h1:before {
+  display: block;
+  float: left;
+  margin-top: 0.8em;
+  border-top: 1px solid var(--purple);
+  width: 50%;
+  content: "";
+}
+
+.aboutme-photo img {
+  height: 200px;
+  width: 200px;
+  flex: 1;
+}
+
+.aboutme-text {
+    flex: 2;
+    padding: 20px;
+}
+
+.my-skills {
+    columns: 2;
+}
+
+.my-skills li{
+    list-style: none;
+}
+
+.my-skills li::before{
+    content: "\25B7"; /* ▹ */
+    color: var(--purple);
+    font-size: 5px;
+    margin-right: 10px;
 }
