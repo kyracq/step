@@ -13,33 +13,42 @@
 // limitations under the License.
 
 var index = 0;
-const jobCount = 3;
+const jobs = [
+  {
+    "title": "UI Development Intern @ Accenture",
+    "dates": "Sept. 2017 - Aug. 2018",
+    "summary": [
+      "Used ReactJS to build a web app that assists with scheduling meetings and greets meeting attendees by name through Amazon Alexa and Microsoft’s FaceID API",
+      "Gained experience in NodeJS, Amazon Web Services, Git, and building Amazon Alexa Skills",
+      "Built UI for a web app intended for Accenture clients to interact with during Accenture presentations",
+      "Aided team working on a new computer aided dispatch system for the New York City Fire Department by doing research on technologies and writing code for proofs of concept",
+      "Assisted in ideation and creation of innovative demos at Accenture Liquid Studio, which rapidly develops demos and software"
+    ]
+  },
+  {
+    "title": "STEP Intern @ Google",
+    "dates": "Summer 2019",
+    "summary": [
+      "Wrote SQL scripts to query datasets to collect and analyze data on bandwidth usage in Google data centers",
+      "Analyzed bandwidth usage data using Python to create a new guideline for bandwidth provisioning in Google data centers with the goal of optimizing resource utilization while minimizing cost",
+      "Wrote design document for project methodology",
+      "Committed code to Google’s codebase, which involved having my code reviewed by Google engineers and writing tests"
+    ]
+  },
+  {
+    "title": "STEP Intern @ Google",
+    "dates": "Summer 2020",
+    "summary": [
+      "Will complete 4 starter projects and a capstone project utilizing Google APIs"
+    ]
+  }
+];
+const jobCount = jobs.length;
 
 /**
  * Set innerHTML text in work experience section
  */
 function setContent() {
-  const jobs = ['UI Development Intern @ Accenture', 'STEP Intern @ Google', 'STEP Intern @ Google'];
-  const dates = ['Sept. 2017 - Aug. 2018', 'Summer 2019', 'Summer 2020'];
-  const bulletPoints = [
-    [
-      'Used ReactJS to build a web app that assists with scheduling meetings and greets meeting attendees by name through Amazon Alexa and Microsoft’s FaceID API',
-      'Gained experience in NodeJS, Amazon Web Services, Git, and building Amazon Alexa Skills',
-      'Built UI for a web app intended for Accenture clients to interact with during Accenture presentations',
-      'Aided team working on a new computer aided dispatch system for the New York City Fire Department by doing research on technologies and writing code for proofs of concept',
-      'Assisted in ideation and creation of innovative demos at Accenture Liquid Studio, which rapidly develops demos and software'
-    ],
-    [
-      'Wrote SQL scripts to query datasets to collect and analyze data on bandwidth usage in Google data centers',
-      'Analyzed bandwidth usage data using Python to create a new guideline for bandwidth provisioning in Google data centers with the goal of optimizing resource utilization while minimizing cost',
-      'Wrote design document for project methodology',
-      'Committed code to Google’s codebase, which involved having my code reviewed by Google engineers and writing tests'
-    ],
-    [
-      'Will complete 4 starter projects and a capstone project utilizing Google APIs'
-    ]
-  ];
-
   const job = document.getElementById('job');
   const date = document.getElementById('date');
   const summary = document.getElementById('summary');
@@ -50,9 +59,9 @@ function setContent() {
   /* Use setTimeout to make opacity change from 0 to 1
   after 600ms as a transition */
   setTimeout(function() {
-    job.innerHTML = jobs[index];
-    date.innerHTML = dates[index];
-    summary.innerHTML = '<ul>' + bulletPoints[index].map(function(point) {
+    job.innerHTML = jobs[index].title;
+    date.innerHTML = jobs[index].dates;
+    summary.innerHTML = '<ul>' + jobs[index].summary.map(function(point) {
       return '<li>' + point + '</li>';
     }).join('') + '</ul>';
   }, 600);
@@ -86,3 +95,40 @@ function jobsBack() {
   setContent();
 }
 
+/**
+ * Change accent color to selected color
+ */
+function changeAccentColor(selectedButton) {
+  var classes = selectedButton.className.split(' ');
+  var color = classes[1]; /* The color buttons have two classes and the color is second */
+  var newAccentColor = '--'.concat(color);
+  var hexColor = getComputedStyle(document.documentElement).getPropertyValue(newAccentColor);
+  document.documentElement.style.setProperty('--accent-color', hexColor);
+}
+
+/**
+ * Show/hide the back to top button depending
+ * on how far user has scrolled from the top
+ */
+document.addEventListener('DOMContentLoaded', function() {
+  const backToTopBtn = document.getElementById('back-to-top-btn');
+
+  function toggleBackToTopBtn() {
+    if (window.scrollY > 300) {
+      backToTopBtn.style.opacity = '.5';
+    }
+    else {
+      backToTopBtn.style.opacity = '0';
+    }
+  }
+
+  window.addEventListener('scroll', toggleBackToTopBtn);
+});
+
+/**
+ * Fade in animation for intro section. Called on load
+ */
+function fadeInIntro() {
+  const intro = document.getElementById('intro');
+  intro.style.opacity = '1';
+}
