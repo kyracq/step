@@ -71,26 +71,6 @@ main {
   margin: 0 1.5rem;
 }
 
-.color-buttons .coral i {
-  color: var(--coral);
-}
-
-.color-buttons .green i {
-  color: var(--green);
-}
-
-.color-buttons .blue i {
-  color: var(--blue);
-}
-
-.color-buttons .purple i {
-  color: var(--purple);
-}
-
-.color-buttons .white i {
-  color: var(--text-primary);
-}
-
 .nav-link {
   align-items: center;
   color: var(--text-primary);
