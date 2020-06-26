@@ -147,8 +147,8 @@ main {
 }
 
 .intro h2 {
-  margin: 0 0 0 0;
   font-size: 64px;
+  margin: 0 0 0 0;
 }
 
 .intro h3 {
@@ -281,7 +281,6 @@ p {
 .btn:hover {
   cursor: pointer;
   filter: brightness(85%);
-
 }
 
 #back-to-top-btn {
