@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var index = 0;
+let index = 0;
 const jobs = [
   {
     "title": "UI Development Intern @ Accenture",
@@ -99,10 +99,10 @@ function jobsBack() {
  * Change accent color to selected color
  */
 function changeAccentColor(selectedButton) {
-  var classes = selectedButton.className.split(' ');
-  var color = classes[1]; /* The color buttons have two classes and the color is second */
-  var newAccentColor = '--'.concat(color);
-  var hexColor = getComputedStyle(document.documentElement).getPropertyValue(newAccentColor);
+  const classes = selectedButton.className.split(' ');
+  const color = classes[1]; /* The color buttons have two classes and the color is second */
+  const newAccentColor = '--'.concat(color);
+  const hexColor = getComputedStyle(document.documentElement).getPropertyValue(newAccentColor);
   document.documentElement.style.setProperty('--accent-color', hexColor);
 }
 
