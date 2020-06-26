@@ -270,14 +270,14 @@ p {
   bottom: 20px;
   color: var(--bg-primary);
   cursor: pointer;
-  font-size: 26px;
-  height: 50px;
+  font-size: 39px;
+  height: 75px;
   opacity: 0;
   outline: none;
   position: fixed;
   right: 20px;
   transition: opacity ease-in-out var(--transition-speed);
-  width: 50px;
+  width: 75px;
 }
 
 #back-to-top-btn:hover {
