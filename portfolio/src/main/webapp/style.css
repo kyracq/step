@@ -106,6 +106,26 @@ main {
   cursor: pointer;
 }
 
+#white {
+  color: var(--text-primary)
+}
+
+#coral {
+  color: var(--coral)
+}
+
+#green {
+  color: var(--green)
+}
+
+#blue {
+  color: var(--blue)
+}
+
+#purple {
+  color: var(--purple)
+}
+
 /* Only show icons, not text */
 .link-text {
   display: none;

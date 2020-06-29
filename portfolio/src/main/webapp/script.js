@@ -100,7 +100,8 @@ function jobsBack() {
  */
 function changeAccentColor(selectedButton) {
   const selectedIcon = selectedButton.firstElementChild;
-  const newAccentColor = selectedIcon.style.color;
+  const id = document.getElementById(selectedIcon.id);
+  const newAccentColor = getComputedStyle(id).color;
   document.documentElement.style.setProperty('--accent-color', newAccentColor);
 }
 
@@ -129,4 +130,13 @@ document.addEventListener('DOMContentLoaded', function() {
 function fadeInIntro() {
   const intro = document.getElementById('intro');
   intro.style.opacity = '1';
+}
+
+/**
+ * Fetch text from server and add to DOM.
+ */
+function getData() {
+  fetch('/data').then(response => response.text()).then((dataText) => {
+    document.getElementById('data-container').innerText = dataText;
+  });
 }
