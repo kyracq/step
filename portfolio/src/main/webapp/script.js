@@ -136,7 +136,7 @@ function fadeInIntro() {
  * Fetch text from server and add to DOM.
  */
 function getData() {
-  fetch('/data').then(response => response.text()).then((dataText) => {
-    document.getElementById('data-container').innerText = dataText;
+  fetch('/data').then(response => response.json()).then((comments) => {
+    document.getElementById('comment-container').innerHTML = comments.join(" <br> ");
   });
 }
