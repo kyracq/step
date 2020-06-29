@@ -100,7 +100,8 @@ function jobsBack() {
  */
 function changeAccentColor(selectedButton) {
   const selectedIcon = selectedButton.firstElementChild;
-  const newAccentColor = selectedIcon.style.color;
+  const id = document.getElementById(selectedIcon.id);
+  const newAccentColor = getComputedStyle(id).color;
   document.documentElement.style.setProperty('--accent-color', newAccentColor);
 }
 
