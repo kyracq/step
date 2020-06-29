@@ -99,11 +99,9 @@ function jobsBack() {
  * Change accent color to selected color
  */
 function changeAccentColor(selectedButton) {
-  const classes = selectedButton.className.split(' ');
-  const color = classes[1]; /* The color buttons have two classes and the color is second */
-  const newAccentColor = '--'.concat(color);
-  const hexColor = getComputedStyle(document.documentElement).getPropertyValue(newAccentColor);
-  document.documentElement.style.setProperty('--accent-color', hexColor);
+  const selectedIcon = selectedButton.firstElementChild;
+  const newAccentColor = selectedIcon.style.color;
+  document.documentElement.style.setProperty('--accent-color', newAccentColor);
 }
 
 /**
