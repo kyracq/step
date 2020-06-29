@@ -131,3 +131,12 @@ function fadeInIntro() {
   const intro = document.getElementById('intro');
   intro.style.opacity = '1';
 }
+
+/**
+ * Fetch text from server and add to DOM.
+ */
+function getData() {
+  fetch('/data').then(response => response.text()).then((dataText) => {
+    document.getElementById('data-container').innerText = dataText;
+  });
+}
