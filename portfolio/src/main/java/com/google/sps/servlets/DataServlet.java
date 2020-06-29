@@ -14,7 +14,9 @@
 
 package com.google.sps.servlets;
 
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,9 +26,27 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/data")
 public class DataServlet extends HttpServlet {
 
+  private static ArrayList<String> msgs = new ArrayList<String>();
+
+  public DataServlet() {
+    msgs.add("Message 1");
+    msgs.add("Message 2");
+    msgs.add("Message 3");
+  }
+
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    response.setContentType("text/html;");
-    response.getWriter().println("Hello Kyra!");
+    String json = convertToJson(msgs);
+    response.setContentType("application/json;");
+    response.getWriter().println(json);
+  }
+
+  /**
+   * Convert list of messages to JSON
+   */
+  private String convertToJson(ArrayList<String> msgs) {
+    Gson gson = new Gson();
+    String json = gson.toJson(msgs);
+    return json;
   }
 }
