@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
@@ -30,7 +31,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle comments data */
+/** Servlet that returns some example content. TODO: modify this file to handle 
+ * comments data */
 @WebServlet("/comments")
 public class DataServlet extends HttpServlet {
 
@@ -38,11 +40,13 @@ public class DataServlet extends HttpServlet {
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
 
+    int maxComments = Integer.parseInt(request.getParameter("max-comments"));
+
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
     List<Comment> comments = new ArrayList<>();
-    for (Entity entity : results.asIterable()) {
+    for (Entity entity : results.asIterable(FetchOptions.Builder.withLimit(maxComments))) {
       long id = entity.getKey().getId();
       String name = (String) entity.getProperty("name");
       String text = (String) entity.getProperty("text");
@@ -53,7 +57,7 @@ public class DataServlet extends HttpServlet {
     }
 
     Gson gson = new Gson();
-
+    
     response.setContentType("application/json;");
     response.getWriter().println(gson.toJson(comments));
   }
