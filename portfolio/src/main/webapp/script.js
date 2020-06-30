@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 /**
- * Fade in animation for intro section. Called on load
+ * Fade in animation for intro section.
  */
 function fadeInIntro() {
   const intro = document.getElementById('intro');
@@ -133,10 +133,36 @@ function fadeInIntro() {
 }
 
 /**
- * Fetch text from server and add to DOM.
+ * Fetch comments from server and add to DOM.
  */
-function getData() {
-  fetch('/data').then(response => response.json()).then((comments) => {
-    document.getElementById('comment-container').innerHTML = comments.join(" <br> ");
+function getComments() {
+  fetch('/comments').then(response => response.json()).then((comments) => {
+    const commentsContainer = document.getElementById('comments-container');
+    comments.forEach((comment) => {
+      commentsContainer.appendChild(createCommentElement(comment));
+    })
   });
+}
+
+/**
+ * Create element that represents a comment.
+ */
+function createCommentElement(comment) {
+  const commentElement = document.createElement('div');
+
+  const nameElement = document.createElement('div');
+  nameElement.innerText = comment.name;
+
+  const textElement = document.createElement('div');
+  textElement.innerText = comment.text;
+
+  const timeElement = document.createElement('div');
+  const timestampString = new Date(comment.timestamp).toString();
+  timeElement.innerText = timestampString;
+
+  commentElement.appendChild(nameElement);
+  commentElement.appendChild(textElement);
+  commentElement.appendChild(timeElement);
+
+  return commentElement;
 }

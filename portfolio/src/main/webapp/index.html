@@ -12,7 +12,7 @@
   <script src="https://kit.fontawesome.com/147abf983d.js" crossorigin="anonymous"></script>
 </head>
 
-<body onload="setContent(); fadeInIntro(); getData();">
+<body onload="setContent(); fadeInIntro(); getComments();">
   <nav class="navbar">
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -71,13 +71,16 @@
     <a href="#">
       <button id="back-to-top-btn"><i class="fas fa-chevron-up"></i></button>
     </a>
-    <form action="/data" method="POST">
+    <form action="/comments" method="POST">
       <p>Add a comment</p>
+      <label for="name">Enter your name:</label>
+      <input type="text" id="name" name="name-input"><br><br>
       <textarea name="comment-input">Type your commment here</textarea>
-      <input type="submit"/>
+      <input type="submit">
     </form>
-    <div id="comment-container"></div>
-    <div class="intro" id="intro" />
+    <p>Comments</p>
+    <div id="comments-container"></div>
+    <div class="intro" id="intro">
       <h4>Hi, my name is</h4>
       <h2>Kyra Acquah.</h3>
       <h3>Welcome to my portfolio.</h3>
