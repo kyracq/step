@@ -28,6 +28,10 @@ main {
   margin-left: 5.25rem; /* 5.25x root font size */
 }
 
+p {
+  font-family: 'Open Sans', sans-serif;
+}
+
 .navbar {
   background-color: var(--bg-primary);
   height: 100vh; /* 100% of window height */
@@ -202,6 +206,17 @@ h1:after {
   display: none;
 }
 
+#comments-header {
+  border-top: 1px solid var(--accent-color);
+  padding-top: 20px;
+  text-align: left;
+}
+
+#comments-header:before,
+#comments-header:after {
+  display: none;
+}
+
 .aboutme-content {
   display: grid;
   grid-template-columns: auto auto;
@@ -217,10 +232,6 @@ h1:after {
 
 .aboutme-text {
   padding: 20px;
-}
-
-p {
-  font-family: 'Open Sans', sans-serif;
 }
 
 .my-skills {
@@ -263,6 +274,7 @@ p {
   padding: 0 20px 0 20px;
 }
 
+input[type=submit],
 .btn {
   background-color: var(--accent-color);
   border-radius: 2px;
@@ -278,6 +290,7 @@ p {
   width: fit-content;
 }
 
+input[type=submit]:hover,
 .btn:hover {
   cursor: pointer;
   filter: brightness(85%);
@@ -302,6 +315,16 @@ p {
 
 #back-to-top-btn:hover {
   color: black;
+}
+
+.add-comment {
+  display: grid;
+  width: 40%;
+}
+
+textarea,
+input {
+  font-family: 'Open Sans', sans-serif;
 }
 
 footer {

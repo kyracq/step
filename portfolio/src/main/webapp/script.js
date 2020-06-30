@@ -76,10 +76,7 @@ function setContent() {
  */
 function jobsNext() {
   index = index + 1;
-  if (index === jobCount) {
-    index = 0;
-  }
-
+  if (index === jobCount) index = 0;
   setContent();
 }
 
@@ -88,10 +85,7 @@ function jobsNext() {
  */
 function jobsBack() {
   index = index - 1;
-  if (index === -1) {
-    index = 2;
-  }
-
+  if (index === -1) index = 2;
   setContent();
 }
 
@@ -136,11 +130,16 @@ function fadeInIntro() {
  * Fetch comments from server and add to DOM.
  */
 function getComments() {
-  fetch('/comments').then(response => response.json()).then((comments) => {
+  const maxComments = document.getElementById('max-comments').value;
+
+  fetch(`/comments?max-comments=${maxComments}`).then(response => response.json()).then((comments) => {
     const commentsContainer = document.getElementById('comments-container');
+    while (commentsContainer.firstChild) { /* Remove old comments */
+      commentsContainer.removeChild(commentsContainer.firstChild);
+    }
     comments.forEach((comment) => {
       commentsContainer.appendChild(createCommentElement(comment));
-    })
+    });
   });
 }
 
