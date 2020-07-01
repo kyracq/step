@@ -58,15 +58,15 @@ function setContent() {
 
   /* Use setTimeout to make opacity change from 0 to 1
   after 600ms as a transition */
-  setTimeout(function() {
+  setTimeout(function () {
     job.innerHTML = jobs[index].title;
     date.innerHTML = jobs[index].dates;
-    summary.innerHTML = '<ul>' + jobs[index].summary.map(function(point) {
+    summary.innerHTML = '<ul>' + jobs[index].summary.map(function (point) {
       return '<li>' + point + '</li>';
     }).join('') + '</ul>';
   }, 600);
 
-  setTimeout(function() {
+  setTimeout(function () {
     carouselContent.style.opacity = 1;
   }, 600);
 }
@@ -103,7 +103,7 @@ function changeAccentColor(selectedButton) {
  * Show/hide the back to top button depending
  * on how far user has scrolled from the top
  */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   const backToTopBtn = document.getElementById('back-to-top-btn');
 
   function toggleBackToTopBtn() {
@@ -131,6 +131,7 @@ function fadeInIntro() {
  */
 function getComments() {
   const maxComments = document.getElementById('max-comments').value;
+  if(maxComments === null) maxComments = 5; /* Show at most 5 comments by default. */
 
   fetch(`/comments?max-comments=${maxComments}`).then(response => response.json()).then((comments) => {
     const commentsContainer = document.getElementById('comments-container');
@@ -164,4 +165,14 @@ function createCommentElement(comment) {
   commentElement.appendChild(timeElement);
 
   return commentElement;
+}
+
+/**
+ * Delete all comments from datastore.
+ */
+function deleteAllComments() {
+  fetch('/delete-data', {
+    method: 'POST',
+  })
+  .then(getComments());
 }

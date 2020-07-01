@@ -31,8 +31,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet that returns some example content. TODO: modify this file to handle 
- * comments data */
+/** Servlet that gets and posts comments. */
 @WebServlet("/comments")
 public class DataServlet extends HttpServlet {
 
@@ -57,7 +56,7 @@ public class DataServlet extends HttpServlet {
     }
 
     Gson gson = new Gson();
-    
+
     response.setContentType("application/json;");
     response.getWriter().println(gson.toJson(comments));
   }
@@ -75,6 +74,6 @@ public class DataServlet extends HttpServlet {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
 
-    response.sendRedirect("/index.html");
+    response.sendRedirect("/index.html#comment-section");
   }
 }
