@@ -131,6 +131,7 @@ function fadeInIntro() {
  */
 function getComments() {
   const maxComments = document.getElementById('max-comments').value;
+  if (maxComments === null) maxComments = 5; /* Show at most 5 comments by default. */
 
   fetch(`/comments?max-comments=${maxComments}`).then(response => response.json()).then((comments) => {
     const commentsContainer = document.getElementById('comments-container');
@@ -164,4 +165,16 @@ function createCommentElement(comment) {
   commentElement.appendChild(timeElement);
 
   return commentElement;
+}
+
+/**
+ * Delete all comments from datastore.
+ */
+function deleteAllComments() {
+  if (confirm('Are you sure you want to delete all comments, ' +
+    'including those from other users?')) {
+    fetch('/delete-data', {
+      method: 'POST',
+    }).then(getComments());
+  }
 }
