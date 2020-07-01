@@ -133,7 +133,10 @@ function getComments() {
   const maxComments = document.getElementById('max-comments').value;
   if (maxComments === null) maxComments = 5; /* Show at most 5 comments by default. */
 
-  fetch(`/comments?max-comments=${maxComments}`).then(response => response.json()).then((comments) => {
+  fetch(`/comments?max-comments=${maxComments}`)
+  .then(response => response.json())
+  .then((res) => {
+    const comments = res.comments;
     const commentsContainer = document.getElementById('comments-container');
     while (commentsContainer.firstChild) { /* Remove old comments */
       commentsContainer.removeChild(commentsContainer.firstChild);
@@ -173,6 +176,5 @@ function createCommentElement(comment) {
 function deleteAllComments() {
   fetch('/delete-data', {
     method: 'POST',
-  })
-    .then(getComments());
+  }).then(getComments());
 }

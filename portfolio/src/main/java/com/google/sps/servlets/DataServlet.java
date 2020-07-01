@@ -22,6 +22,9 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.sps.data.Comment;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,12 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/comments")
 public class DataServlet extends HttpServlet {
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private List<Comment> queryComments(int maxComments) {
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
-
-    int maxComments = Integer.parseInt(request.getParameter("max-comments"));
-
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
@@ -54,11 +53,39 @@ public class DataServlet extends HttpServlet {
       Comment comment = new Comment(id, name, text, timestamp);
       comments.add(comment);
     }
+    return comments;
+  }
 
-    Gson gson = new Gson();
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    JsonObject res = new JsonObject();
+
+    try {
+      int maxComments = Integer.parseInt(request.getParameter("max-comments"));
+      List<Comment> comments = queryComments(maxComments);
+
+      Gson gson = new Gson();
+
+      JsonParser parser = new JsonParser();
+      JsonElement commentsJson = parser.parse(gson.toJson(comments));
+
+      res.add("comments", commentsJson);
+      res.addProperty("success", true);
+      } catch (Exception e) {
+        res.addProperty("success", false);
+        String errorMessage = e.getMessage();
+
+        if (errorMessage == "null") {
+          errorMessage = "Please enter a value for maxComments.";
+        }
+        else {
+          errorMessage = "NumberFormatException: " + errorMessage;
+        }
+        res.addProperty("errorMessage", errorMessage);
+      }
 
     response.setContentType("application/json;");
-    response.getWriter().println(gson.toJson(comments));
+    response.getWriter().println(res.toString());
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
