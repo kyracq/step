@@ -58,7 +58,7 @@ public class DataServlet extends HttpServlet {
 
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    JsonObject res = new JsonObject();
+    JsonObject jsonResponse = new JsonObject();
 
     try {
       int maxComments = Integer.parseInt(request.getParameter("max-comments"));
@@ -69,23 +69,26 @@ public class DataServlet extends HttpServlet {
       JsonParser parser = new JsonParser();
       JsonElement commentsJson = parser.parse(gson.toJson(comments));
 
-      res.add("comments", commentsJson);
-      res.addProperty("success", true);
-      } catch (Exception e) {
-        res.addProperty("success", false);
-        String errorMessage = e.getMessage();
+      jsonResponse.add("comments", commentsJson);
+      jsonResponse.addProperty("success", true);
+      } catch (NumberFormatException nfe) {
+        jsonResponse.addProperty("success", false);
+        String errorMessage = nfe.getMessage();
 
+        /* When NumberFormatException caught because
+        *  max-comments parameter is null */
         if (errorMessage == "null") {
           errorMessage = "Please enter a value for maxComments.";
         }
-        else {
-          errorMessage = "NumberFormatException: " + errorMessage;
+        else { /* When max-comments parameter is not a number */
+          errorMessage = "NumberFormatException: " + errorMessage +
+            ": Please enter a number for maxComments.";
         }
-        res.addProperty("errorMessage", errorMessage);
+        jsonResponse.addProperty("errorMessage", errorMessage);
       }
 
     response.setContentType("application/json;");
-    response.getWriter().println(res.toString());
+    response.getWriter().println(jsonResponse.toString());
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {

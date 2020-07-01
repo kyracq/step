@@ -135,8 +135,8 @@ function getComments() {
 
   fetch(`/comments?max-comments=${maxComments}`)
   .then(response => response.json())
-  .then((res) => {
-    const comments = res.comments;
+  .then((response) => {
+    const comments = response.comments;
     const commentsContainer = document.getElementById('comments-container');
     while (commentsContainer.firstChild) { /* Remove old comments */
       commentsContainer.removeChild(commentsContainer.firstChild);
