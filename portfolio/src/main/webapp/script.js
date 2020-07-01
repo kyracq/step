@@ -171,10 +171,8 @@ function createCommentElement(comment) {
  * Delete all comments from datastore.
  */
 function deleteAllComments() {
-  if (confirm('Are you sure you want to delete all comments, ' +
-    'including those from other users?')) {
-    fetch('/delete-data', {
-      method: 'POST',
-    }).then(getComments());
-  }
+  fetch('/delete-data', {
+    method: 'POST',
+  })
+    .then(getComments());
 }
