@@ -22,6 +22,9 @@ import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.sps.data.Comment;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,12 +38,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/comments")
 public class DataServlet extends HttpServlet {
 
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+  private List<Comment> queryComments(int maxComments) {
     Query query = new Query("Comment").addSort("timestamp", SortDirection.DESCENDING);
-
-    int maxComments = Integer.parseInt(request.getParameter("max-comments"));
-
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     PreparedQuery results = datastore.prepare(query);
 
@@ -54,11 +53,34 @@ public class DataServlet extends HttpServlet {
       Comment comment = new Comment(id, name, text, timestamp);
       comments.add(comment);
     }
+    return comments;
+  }
 
-    Gson gson = new Gson();
+  @Override
+  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    JsonObject jsonResponse = new JsonObject();
+    String maxCommentsString = request.getParameter("max-comments");
+
+    try {
+      int maxComments = Integer.parseInt(maxCommentsString);
+      List<Comment> comments = queryComments(maxComments);
+
+      Gson gson = new Gson();
+
+      JsonParser parser = new JsonParser();
+      JsonElement commentsJson = parser.parse(gson.toJson(comments));
+
+      jsonResponse.add("comments", commentsJson);
+      response.setStatus(HttpServletResponse.SC_OK);
+      } catch (NumberFormatException nfe) {
+        String errorMessage = "NumberFormatException: Invalid input string for "
+            + "parameter max-comments: " + "'" + maxCommentsString + "'";
+        jsonResponse.addProperty("errorMessage", errorMessage);
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      }
 
     response.setContentType("application/json;");
-    response.getWriter().println(gson.toJson(comments));
+    response.getWriter().println(jsonResponse.toString());
   }
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
