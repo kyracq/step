@@ -134,23 +134,25 @@ function getComments() {
   if (maxComments === null) maxComments = 5; /* Show at most 5 comments */
 
   fetch(`/comments?max-comments=${maxComments}`)
-  .then(response => response.json())
-  .then((response) => {
-    const commentsContainer = document.getElementById('comments-container');
-    while (commentsContainer.firstChild) { /* Remove old comments */
-      commentsContainer.removeChild(commentsContainer.firstChild);
-    }
-
-    if(response.success === true) {
-      const comments = response.comments;
-      comments.forEach((comment) => {
-        commentsContainer.appendChild(createCommentElement(comment));
-      });
-    }
-    else {
-      commentsContainer.innerHTML = response.errorMessage;
-    }
-  });
+    .then(response => response.json().then(data =>
+      ({ data: data, success: response.ok })))
+    .then((response) => {
+      const commentsContainer = document.getElementById('comments-container');
+      while (commentsContainer.firstChild) { /* Remove old comments */
+        commentsContainer.removeChild(commentsContainer.firstChild);
+      }
+      if (response.success === true) {
+        const comments = response.data.comments;
+        if(comments != null) {
+          comments.forEach((comment) => {
+            commentsContainer.appendChild(createCommentElement(comment));
+          });
+        }
+      }
+      else {
+        commentsContainer.innerHTML = response.errorMessage;
+      }
+    });
 }
 
 /**
