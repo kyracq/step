@@ -131,19 +131,25 @@ function fadeInIntro() {
  */
 function getComments() {
   const maxComments = document.getElementById('max-comments').value;
-  if (maxComments === null) maxComments = 5; /* Show at most 5 comments by default. */
+  if (maxComments === null) maxComments = 5; /* Show at most 5 comments */
 
   fetch(`/comments?max-comments=${maxComments}`)
   .then(response => response.json())
   .then((response) => {
-    const comments = response.comments;
     const commentsContainer = document.getElementById('comments-container');
     while (commentsContainer.firstChild) { /* Remove old comments */
       commentsContainer.removeChild(commentsContainer.firstChild);
     }
-    comments.forEach((comment) => {
-      commentsContainer.appendChild(createCommentElement(comment));
-    });
+
+    if(response.success === true) {
+      const comments = response.comments;
+      comments.forEach((comment) => {
+        commentsContainer.appendChild(createCommentElement(comment));
+      });
+    }
+    else {
+      commentsContainer.innerHTML = response.errorMessage;
+    }
   });
 }
 

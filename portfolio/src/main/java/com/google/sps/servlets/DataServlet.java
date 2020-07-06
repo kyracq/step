@@ -59,9 +59,10 @@ public class DataServlet extends HttpServlet {
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
     JsonObject jsonResponse = new JsonObject();
+    String maxCommentsString = request.getParameter("max-comments");
 
     try {
-      int maxComments = Integer.parseInt(request.getParameter("max-comments"));
+      int maxComments = Integer.parseInt(maxCommentsString);
       List<Comment> comments = queryComments(maxComments);
 
       Gson gson = new Gson();
@@ -71,20 +72,16 @@ public class DataServlet extends HttpServlet {
 
       jsonResponse.add("comments", commentsJson);
       jsonResponse.addProperty("success", true);
+      response.setStatus(HttpServletResponse.SC_OK);
       } catch (NumberFormatException nfe) {
+        String errorMessage;
         jsonResponse.addProperty("success", false);
-        String errorMessage = nfe.getMessage();
 
-        /* When NumberFormatException caught because
-        *  max-comments parameter is null */
-        if (errorMessage == "null") {
-          errorMessage = "Please enter a value for maxComments.";
-        }
-        else { /* When max-comments parameter is not a number */
-          errorMessage = "NumberFormatException: " + errorMessage +
-            ": Please enter a number for maxComments.";
-        }
+        errorMessage = "NumberFormatException: Invalid input string for "
+            + "parameter max-comments: " + "'" + maxCommentsString + "'";
+
         jsonResponse.addProperty("errorMessage", errorMessage);
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       }
 
     response.setContentType("application/json;");
