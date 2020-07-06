@@ -74,12 +74,9 @@ public class DataServlet extends HttpServlet {
       jsonResponse.addProperty("success", true);
       response.setStatus(HttpServletResponse.SC_OK);
       } catch (NumberFormatException nfe) {
-        String errorMessage;
         jsonResponse.addProperty("success", false);
-
-        errorMessage = "NumberFormatException: Invalid input string for "
+        String errorMessage = "NumberFormatException: Invalid input string for "
             + "parameter max-comments: " + "'" + maxCommentsString + "'";
-
         jsonResponse.addProperty("errorMessage", errorMessage);
         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
       }
