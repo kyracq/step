@@ -222,14 +222,22 @@ function getUserInfo() {
     .then(response => response.json())
     .then((response) => {
       const loginStatusElement = document.getElementById('login-status');
+      const commentForm = document.getElementById('comment-form');
+      const commentMessage = document.getElementById('comment-msg');
+
       if (response.loggedIn) {
         loginStatusElement.innerHTML =
           `<div>Hello ${response.nickname}!</p>
           <a href=${response.logoutUrl}>Log out</a>`;
+          commentForm.style.display = 'block';
+          commentMessage.innerHTML = '';
       }
       else {
         loginStatusElement.innerHTML =
           `<a href=${response.loginUrl}>Log in</a>`;
+        commentMessage.innerHTML = 'Click "Login" in the ' +
+            'top right to get the option to leave a comment.<br><br>';
+        
       }
     });
 }

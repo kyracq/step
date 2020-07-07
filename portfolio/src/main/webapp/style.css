@@ -325,9 +325,12 @@ input[type=submit]:hover,
   right: 0;
 }
 
-.add-comment {
+#add-comment {
   display: grid;
-  width: 40%;
+}
+
+#comment-form {
+  display: none;
 }
 
 #comments-container {
