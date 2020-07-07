@@ -21,6 +21,9 @@ import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.cloud.language.v1.Document;
+import com.google.cloud.language.v1.LanguageServiceClient;
+import com.google.cloud.language.v1.Sentiment;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -49,8 +52,9 @@ public class DataServlet extends HttpServlet {
       String name = (String) entity.getProperty("name");
       String text = (String) entity.getProperty("text");
       long timestamp = (long) entity.getProperty("timestamp");
+      double sentimentScore = (double) entity.getProperty("sentimentScore");
 
-      Comment comment = new Comment(id, name, text, timestamp);
+      Comment comment = new Comment(id, name, text, timestamp, sentimentScore);
       comments.add(comment);
     }
     return comments;
@@ -88,10 +92,19 @@ public class DataServlet extends HttpServlet {
     String name = request.getParameter("name-input");
     long timestamp = System.currentTimeMillis();
 
+    Document commentDocument = Document.newBuilder().setContent(comment)
+        .setType(Document.Type.PLAIN_TEXT).build();
+    LanguageServiceClient languageService = LanguageServiceClient.create();
+    Sentiment sentiment = languageService.analyzeSentiment(commentDocument)
+        .getDocumentSentiment();
+    float score = sentiment.getScore();
+    languageService.close();
+
     Entity commentEntity = new Entity("Comment");
     commentEntity.setProperty("name", name);
     commentEntity.setProperty("text", comment);
     commentEntity.setProperty("timestamp", timestamp);
+    commentEntity.setProperty("sentimentScore", score);
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);

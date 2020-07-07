@@ -171,9 +171,14 @@ function createCommentElement(comment) {
   const timestampString = new Date(comment.timestamp).toString();
   timeElement.innerText = timestampString;
 
+  const scoreElement = document.createElement('div');
+  scoreElement.innerText = 'Sentiment score (Scale from -1 to 1): ' +
+      comment.sentimentScore.toString();
+
   commentElement.appendChild(nameElement);
   commentElement.appendChild(textElement);
   commentElement.appendChild(timeElement);
+  commentElement.appendChild(scoreElement);
 
   return commentElement;
 }
