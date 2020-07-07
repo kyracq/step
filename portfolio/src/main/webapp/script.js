@@ -171,18 +171,10 @@ function parseTimestamp(timestamp) {
  */
 function getIcon(sentimentScore) {
   /* Conditions are ordered. */
-  if (sentimentScore >= 0.5) {
-    return 'sentiment_very_satisfied';
-  }
-  else if (sentimentScore >= 0) {
-    return 'sentiment_satisfied';
-  }
-  else if(sentimentScore >= -0.5) {
-    return 'sentiment_dissatisfied';
-  }
-  else {
-    return 'sentiment_very_dissatisfied';
-  }
+  if (sentimentScore >= 0.5) return 'sentiment_very_satisfied';
+  if (sentimentScore >= 0) return 'sentiment_satisfied';
+  if (sentimentScore >= -0.5) return 'sentiment_dissatisfied';
+  return 'sentiment_very_dissatisfied';
 }
 
 /**
@@ -192,15 +184,23 @@ function getCommentHtml(comment) {
   const tooltipUrl = 'https://cloud.google.com/natural-language/docs/basics' +
       '#interpreting_sentiment_analysis_values';
 
-  const html = `<li><div class="comment"><div>
-      <div class="comment-name">${comment.name}</div>
-      <div class="comment-text">${comment.text}</div>
-      <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
-      </div><div class="sentiment-icon"><span class="material-icons"
-      title="Sentiment score: ${comment.sentimentScore.toFixed(2)}">
-      ${getIcon(comment.sentimentScore)}</span>
-      <a href="${tooltipUrl}" target="_blank" class="more-info">?</a>
-      </div></div></li>`;
+  const html =
+      `<li>
+        <div class="comment">
+          <div>
+            <div class="comment-name">${comment.name}</div>
+            <div class="comment-text">${comment.text}</div>
+            <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
+          </div>
+          <div class="sentiment-icon">
+            <span class="material-icons"
+            title="Sentiment score: ${comment.sentimentScore.toFixed(2)}">
+            ${getIcon(comment.sentimentScore)}
+            </span>
+            <a href="${tooltipUrl}" target="_blank" class="more-info">?</a>
+          </div>
+        </div>
+      </li>`;
 
   return html;
 }
