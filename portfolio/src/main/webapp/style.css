@@ -317,6 +317,14 @@ input[type=submit]:hover,
   color: black;
 }
 
+#login-status {
+  background-color: white;
+  top: 0;
+  padding: 20px;
+  position: fixed;
+  right: 0;
+}
+
 .add-comment {
   display: grid;
   width: 40%;

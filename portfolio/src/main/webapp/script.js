@@ -216,3 +216,41 @@ function deleteAllComments() {
     }).then(getComments());
   }
 }
+
+function getUserInfo() {
+  fetch('/login')
+    .then(response => response.json())
+    .then((response) => {
+      const loginStatusElement = document.getElementById('login-status');
+      if (response.loggedIn) {
+        loginStatusElement.innerHTML =
+          `<div>Hello ${response.nickname}!</p>
+          <a href=${response.logoutUrl}>Log out</a>`;
+      }
+      else {
+        loginStatusElement.innerHTML =
+          `<a href=${response.loginUrl}>Log in</a>`;
+      }
+    });
+}
+
+function setUserNickname() {
+  /* Check if user has already set a nickname */
+  fetch('/login')
+    .then(response => response.json())
+    .then((response) => {
+      if (response.nickname != "") {
+        window.location.replace("/");
+      }
+      /* If no nickname set, prompt for a nickname and save to datastore */
+      else {
+        let nickname = prompt('Enter a nickname to be displayed when you ' +
+          'leave a comment.');
+        /* TODO: don't allow user to cancel nickname input */
+        if(nickname == null) nickname = 'Anonymous';
+        fetch(`/nickname?nickname=${nickname}`, {
+          method: 'POST',
+        }).then(window.location.replace("/"));
+      }
+    });
+}
