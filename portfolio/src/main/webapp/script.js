@@ -170,6 +170,7 @@ function parseTimestamp(timestamp) {
  * Get name of icon that represents sentiment score.
  */
 function getIcon(sentimentScore) {
+  /* Conditions are ordered. */
   if (sentimentScore >= 0.5) {
     return 'sentiment_very_satisfied';
   }
@@ -188,17 +189,18 @@ function getIcon(sentimentScore) {
  * Create element that represents a comment.
  */
 function getCommentHtml(comment) {
-  const html = '<li><div class="comment"><div>' +
-      '<div class="comment-name">' + comment.name + '</div>' +
-      '<div class="comment-text">' + comment.text + '</div>' +
-      '<div class="comment-time">' + parseTimestamp(comment.timestamp) +
-      '</div></div><div class="sentiment-icon"><span class="material-icons" ' +
-      'title="Sentiment score: ' + comment.sentimentScore.toFixed(1) +
-      '">' + getIcon(comment.sentimentScore) +
-      '</span><a href="https://cloud.google.com/natural-language/docs/basics' +
-      '#interpreting_sentiment_analysis_values" target="_blank"' +
-      'class="more-info">?</a>' +
-      '</div></div></li>';
+  const tooltipUrl = 'https://cloud.google.com/natural-language/docs/basics' +
+      '#interpreting_sentiment_analysis_values';
+
+  const html = `<li><div class="comment"><div>
+      <div class="comment-name">${comment.name}</div>
+      <div class="comment-text">${comment.text}</div>
+      <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
+      </div><div class="sentiment-icon"><span class="material-icons"
+      title="Sentiment score: ${comment.sentimentScore.toFixed(2)}">
+      ${getIcon(comment.sentimentScore)}</span>
+      <a href="${tooltipUrl}" target="_blank" class="more-info">?</a>
+      </div></div></li>`;
 
   return html;
 }
