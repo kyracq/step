@@ -322,6 +322,27 @@ input[type=submit]:hover,
   width: 40%;
 }
 
+#comments-container {
+  list-style-type: none;
+}
+
+#comments-container li{
+  margin-top: 10px;
+}
+
+.comment {
+  display: grid;
+  grid-template-columns: 80% 20%;
+}
+
+.comment-name {
+  font-weight: bolder;
+}
+
+.sentiment-icon .material-icons{
+  font-size: 40px;
+}
+
 textarea,
 input {
   font-family: 'Open Sans', sans-serif;

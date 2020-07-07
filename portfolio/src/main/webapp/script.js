@@ -143,9 +143,12 @@ function getComments() {
       }
       if (response.success === true) {
         const comments = response.data.comments;
-        if(comments != null) {
+        if (comments != null) {
           comments.forEach((comment) => {
-            commentsContainer.appendChild(createCommentElement(comment));
+            const commentHtml = getCommentHtml(comment);
+            const commentElement = document.createElement('div');
+            commentElement.innerHTML = commentHtml;
+            commentsContainer.appendChild(commentElement);
           });
         }
       }
@@ -156,31 +159,50 @@ function getComments() {
 }
 
 /**
+ * Format timestamp for display in comment section.
+ */
+function parseTimestamp(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleString();
+}
+
+/**
+ * Get name of icon that represents sentiment score.
+ */
+function getIcon(sentimentScore) {
+  /* Conditions are ordered. */
+  if (sentimentScore >= 0.5) return 'sentiment_very_satisfied';
+  if (sentimentScore >= 0) return 'sentiment_satisfied';
+  if (sentimentScore >= -0.5) return 'sentiment_dissatisfied';
+  return 'sentiment_very_dissatisfied';
+}
+
+/**
  * Create element that represents a comment.
  */
-function createCommentElement(comment) {
-  const commentElement = document.createElement('div');
+function getCommentHtml(comment) {
+  const tooltipUrl = 'https://cloud.google.com/natural-language/docs/basics' +
+      '#interpreting_sentiment_analysis_values';
 
-  const nameElement = document.createElement('div');
-  nameElement.innerText = comment.name;
+  const html =
+      `<li>
+        <div class="comment">
+          <div>
+            <div class="comment-name">${comment.name}</div>
+            <div class="comment-text">${comment.text}</div>
+            <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
+          </div>
+          <div class="sentiment-icon">
+            <span class="material-icons"
+            title="Sentiment score: ${comment.sentimentScore.toFixed(2)}">
+            ${getIcon(comment.sentimentScore)}
+            </span>
+            <a href="${tooltipUrl}" target="_blank" class="more-info">?</a>
+          </div>
+        </div>
+      </li>`;
 
-  const textElement = document.createElement('div');
-  textElement.innerText = comment.text;
-
-  const timeElement = document.createElement('div');
-  const timestampString = new Date(comment.timestamp).toString();
-  timeElement.innerText = timestampString;
-
-  const scoreElement = document.createElement('div');
-  scoreElement.innerText = 'Sentiment score (Scale from -1 to 1): ' +
-      comment.sentimentScore.toString();
-
-  commentElement.appendChild(nameElement);
-  commentElement.appendChild(textElement);
-  commentElement.appendChild(timeElement);
-  commentElement.appendChild(scoreElement);
-
-  return commentElement;
+  return html;
 }
 
 /**
