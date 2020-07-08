@@ -217,7 +217,10 @@ function deleteAllComments() {
   }
 }
 
-function getUserInfo() {
+/**
+ * Check if user is logged in a display login status.
+ */
+function getLoginStatus() {
   fetch('/login')
     .then(response => response.json())
     .then((response) => {
@@ -242,6 +245,9 @@ function getUserInfo() {
     });
 }
 
+/**
+ * Set logged in user's nickname if they don't have one set.
+ */
 function setUserNickname() {
   /* Check if user has already set a nickname */
   fetch('/login')
