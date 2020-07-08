@@ -247,15 +247,28 @@ function setUserNickname() {
   fetch('/login')
     .then(response => response.json())
     .then((response) => {
-      if (response.nickname != "") {
+      /* If nickname is a non-empty string, redirect to main page */
+      if (response.nickname != undefined && response.nickname.length != 0) {
         window.location.replace("/");
       }
       /* If no nickname set, prompt for a nickname and save to datastore */
       else {
         let nickname = prompt('Enter a nickname to be displayed when you ' +
           'leave a comment.');
-        /* TODO: don't allow user to cancel nickname input */
-        if(nickname == null) nickname = 'Anonymous';
+        const alphaExp = /^[a-zA-Z]+$/; /* Regex for only letters */
+        /* Only allow non-empty string inputs */
+        if (nickname == null || nickname == "") {
+          alert("Please enter a nickname.");
+          location.reload(); /* Refresh which will re-prompt */
+          return;
+        }
+        /* Only allow inputs that contain only letters */
+        else if (!alphaExp.test(nickname)) {
+          alert("Nickname must contain letters only.")
+          location.reload();
+          return;
+        }
+
         fetch(`/nickname?nickname=${nickname}`, {
           method: 'POST',
         }).then(window.location.replace("/"));
