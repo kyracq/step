@@ -94,7 +94,6 @@ public class DataServlet extends HttpServlet {
     String comment = request.getParameter("comment-input");
     long timestamp = System.currentTimeMillis();
 
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     UserService userService = UserServiceFactory.getUserService();
     String id = userService.getCurrentUser().getUserId();
     String name = LoginServlet.getUserNickname(id);
@@ -113,6 +112,7 @@ public class DataServlet extends HttpServlet {
     commentEntity.setProperty("timestamp", timestamp);
     commentEntity.setProperty("sentimentScore", score);
 
+    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     datastore.put(commentEntity);
 
     response.sendRedirect("/index.html#comment-section");
