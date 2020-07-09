@@ -43,6 +43,7 @@ const jobs = [
     ]
   }
 ];
+
 const jobCount = jobs.length;
 
 /**
@@ -271,6 +272,7 @@ function displayLoginStatus(loginStatus) {
   }
 }
 
+/* Fetch login status and set HTML content accordingly. */
 async function getAndDisplayLoginStatus() {
   const loginStatus = await getLoginStatus();
   displayLoginStatus(loginStatus);
