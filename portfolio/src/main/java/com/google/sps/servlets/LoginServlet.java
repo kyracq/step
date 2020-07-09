@@ -60,7 +60,9 @@ public class LoginServlet extends HttpServlet {
       String logoutUrl = userService.createLogoutURL("/");
       jsonResponse.addProperty("logoutUrl", logoutUrl);
       User user = userService.getCurrentUser();
-      jsonResponse.addProperty("nickname", getUserNickname(user.getUserId()));
+      String userId = user.getUserId();
+      jsonResponse.addProperty("nickname", getUserNickname(userId));
+      jsonResponse.addProperty("userId", userId);
     }
 
     response.setContentType("application/json;");

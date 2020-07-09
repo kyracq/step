@@ -319,10 +319,21 @@ input[type=submit]:hover,
 
 #login-status {
   background-color: white;
-  top: 0;
-  padding: 20px;
+  column-gap: 5px;
+  display: grid;
+  grid-template-columns: auto auto;
+  padding: 10px;
   position: fixed;
   right: 0;
+  top: 0;
+}
+
+.comment-width-wrapper {
+  max-width: 1000px;
+}
+
+#comment-msg {
+  margin-bottom: 20px;
 }
 
 #add-comment {
@@ -335,6 +346,7 @@ input[type=submit]:hover,
 
 #comments-container {
   list-style-type: none;
+  padding-inline-start: 0;
 }
 
 #comments-container li{
@@ -342,16 +354,38 @@ input[type=submit]:hover,
 }
 
 .comment {
-  display: grid;
-  grid-template-columns: 80% 20%;
+  display: flex;
+}
+
+.comment-content {
+  flex-grow: 1;
 }
 
 .comment-name {
   font-weight: bolder;
 }
 
+.no-delete-button {
+  margin: 20px;
+}
+
+.delete-btn {
+	background: none;
+  border: none;
+  cursor: pointer;
+  margin: 20px;
+}
+
+.delete-btn:focus {
+  outline: none;
+}
+
 .sentiment-icon .material-icons{
   font-size: 40px;
+}
+
+.sentiment-icon a:visited {
+  color: black;
 }
 
 textarea,

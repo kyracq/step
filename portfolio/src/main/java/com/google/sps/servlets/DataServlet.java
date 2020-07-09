@@ -53,11 +53,12 @@ public class DataServlet extends HttpServlet {
     for (Entity entity : results.asIterable(FetchOptions.Builder.withLimit(maxComments))) {
       long id = entity.getKey().getId();
       String name = (String) entity.getProperty("name");
+      String userId = (String) entity.getProperty("userId");
       String text = (String) entity.getProperty("text");
       long timestamp = (long) entity.getProperty("timestamp");
       double sentimentScore = (double) entity.getProperty("sentimentScore");
 
-      Comment comment = new Comment(id, name, text, timestamp, sentimentScore);
+      Comment comment = new Comment(id, name, userId, text, timestamp, sentimentScore);
       comments.add(comment);
     }
     return comments;
@@ -96,8 +97,8 @@ public class DataServlet extends HttpServlet {
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
     UserService userService = UserServiceFactory.getUserService();
-    String id = userService.getCurrentUser().getUserId();
-    String name = LoginServlet.getUserNickname(id);
+    String userId = userService.getCurrentUser().getUserId();
+    String name = LoginServlet.getUserNickname(userId);
 
     Document commentDocument = Document.newBuilder().setContent(comment)
         .setType(Document.Type.PLAIN_TEXT).build();
@@ -109,6 +110,7 @@ public class DataServlet extends HttpServlet {
 
     Entity commentEntity = new Entity("Comment");
     commentEntity.setProperty("name", name);
+    commentEntity.setProperty("userId", userId);
     commentEntity.setProperty("text", comment);
     commentEntity.setProperty("timestamp", timestamp);
     commentEntity.setProperty("sentimentScore", score);
