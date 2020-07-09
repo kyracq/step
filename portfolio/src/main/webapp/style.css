@@ -329,7 +329,9 @@ input[type=submit]:hover,
 }
 
 .comment-width-wrapper {
+  justify-self: center;
   max-width: 1000px;
+  width: 100%;
 }
 
 #comment-msg {
@@ -350,11 +352,16 @@ input[type=submit]:hover,
 }
 
 #comments-container li{
+  display: flex;
   margin-top: 10px;
 }
 
 .comment {
   display: flex;
+}
+
+.comment-content-wrapper {
+  width: 90%;
 }
 
 .comment-content {
@@ -365,8 +372,8 @@ input[type=submit]:hover,
   font-weight: bolder;
 }
 
-.no-delete-button {
-  margin: 20px;
+.delete-btn-wrapper {
+  width: 10%;
 }
 
 .delete-btn {
@@ -378,6 +385,11 @@ input[type=submit]:hover,
 
 .delete-btn:focus {
   outline: none;
+}
+
+.sentiment-icon {
+  align-items: center;
+  display: flex;
 }
 
 .sentiment-icon .material-icons{

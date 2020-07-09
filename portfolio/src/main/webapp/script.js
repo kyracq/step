@@ -187,7 +187,7 @@ function getCommentHtml(comment, userId) {
     '#interpreting_sentiment_analysis_values';
   
   /* Show delete button if it's the user's comment. */
-  let deleteButton = '<div class="no-delete-btn"></div>';
+  let deleteButton = '';
   if (comment.userId === userId) {
     deleteButton = 
         `<button class="delete-btn" onClick="deleteComment(${comment.id})">
@@ -200,21 +200,25 @@ function getCommentHtml(comment, userId) {
 
   const html =
       `<li>
-        <div class="comment">
+        <div class="comment-content-wrapper">
+          <div class="comment">
+            <div class="comment-content">
+              <div class="comment-name">${comment.name}</div>
+              <div class="comment-text">${comment.text}</div>
+              <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
+            </div>
+            <div class="sentiment-icon">
+              <a href="${tooltipUrl}" target="_blank">
+                <span class="material-icons"
+                title="${sentimentIconTitle}">
+                ${getIcon(comment.sentimentScore)}
+                </span>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="delete-btn-wrapper">
           ${deleteButton}
-          <div class="comment-content">
-            <div class="comment-name">${comment.name}</div>
-            <div class="comment-text">${comment.text}</div>
-            <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
-          </div>
-          <div class="sentiment-icon">
-            <a href="${tooltipUrl}" target="_blank">
-              <span class="material-icons"
-              title="${sentimentIconTitle}">
-              ${getIcon(comment.sentimentScore)}
-              </span>
-            </a>
-          </div>
         </div>
       </li>`;
 
