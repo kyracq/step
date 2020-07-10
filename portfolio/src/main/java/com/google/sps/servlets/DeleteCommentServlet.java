@@ -35,13 +35,12 @@ public class DeleteCommentServlet extends HttpServlet {
     long id = Long.parseLong(request.getParameter("id"));
 
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query = new Query("Comment");
+    Query query = new Query("Comment").setKeysOnly();
     PreparedQuery results = datastore.prepare(query);
 
     for (Entity entity : results.asIterable()) {
-      Key entityKey = entity.getKey();
-      if(id == entityKey.getId()) {
-        Key key = entityKey;
+      Key key = entity.getKey();
+      if(id == key.getId()) {
         datastore.delete(key);
         break;
       }

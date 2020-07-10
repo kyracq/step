@@ -233,9 +233,7 @@ function deleteComment(id) {
     fetch(`/delete-comment?id=${id}`, {
       method: 'POST',
     }).then(() => {
-      /* Wait before refreshing to make
-       * sure datastore has been updated*/
-      setTimeout(function(){ location.reload(); }, 200);
+      getComments();
     });
   }
 }
