@@ -12,7 +12,7 @@
   <script src="https://kit.fontawesome.com/147abf983d.js" crossorigin="anonymous"></script>
 </head>
 
-<body onload="setContent(); fadeInIntro(); getComments(); getLoginStatus();">
+<body onload="setContent(); fadeInIntro(); getComments(); getAndDisplayLoginStatus();">
   <nav class="navbar">
     <ul class="navbar-nav">
       <li class="nav-item">
@@ -133,19 +133,20 @@
     </div>
     <div id="comment-section" class="section-wrapper">
       <h1 id="comments-header">Comments</h1>
-      <div id="comment-msg"></div>
-      <div id="comment-form">
-        <form action="/comments" method="POST" name="comment-form">
-          <div id="add-comment">
-            <textarea placeholder="Leave a comment" name="comment-input" required></textarea>
-            <input type="submit">
-          </div>
-        </form>
+      <div class="comment-width-wrapper">
+        <div id="comment-msg"></div>
+        <div id="comment-form">
+          <form action="/comments" method="POST" name="comment-form">
+            <div id="add-comment">
+              <textarea placeholder="Leave a comment" name="comment-input" required></textarea>
+              <input type="submit">
+            </div>
+          </form>
+        </div>
+        <label for="max-comments">Number of comments to show:</label>
+        <input type="number" id="max-comments" name="max-comments" min="1" value="5" onChange="getComments()">
+        <ul id="comments-container"></ul>
       </div>
-      <label for="max-comments">Number of comments to show:</label>
-      <input type="number" id="max-comments" name="max-comments" min="1" max="20" value="5" onChange="getComments()">
-      <ul id="comments-container"></ul>
-      <button onClick="deleteAllComments()">Delete all comments</button>
     </div>
     <footer>
       This site was made by Kyra Acquah as part of the Google STEP program.
