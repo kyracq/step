@@ -39,9 +39,11 @@ public class DeleteCommentServlet extends HttpServlet {
     PreparedQuery results = datastore.prepare(query);
 
     for (Entity entity : results.asIterable()) {
-      if(id == entity.getKey().getId()) {
-        Key key = entity.getKey();
+      Key entityKey = entity.getKey();
+      if(id == entityKey.getId()) {
+        Key key = entityKey;
         datastore.delete(key);
+        break;
       }
     }
   }
