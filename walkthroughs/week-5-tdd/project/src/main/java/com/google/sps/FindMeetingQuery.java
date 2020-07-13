@@ -17,8 +17,6 @@ package com.google.sps;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 public final class FindMeetingQuery {
   /**
@@ -44,8 +42,6 @@ public final class FindMeetingQuery {
 
     ArrayList<TimeRange> invalidRanges = new ArrayList<TimeRange>();
     for (Event event : events) {
-      Set<String> intersection = new HashSet<String>(attendees);
-
       // If there are attendees in common between the request and this event
       if(!Collections.disjoint(attendees, event.getAttendees())) {
         // Requested meeting can't be at same time as this event
