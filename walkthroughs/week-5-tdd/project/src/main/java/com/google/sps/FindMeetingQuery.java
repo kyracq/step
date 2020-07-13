@@ -75,13 +75,14 @@ public final class FindMeetingQuery {
 
     invalidRangeStart = invalidRanges.get(0).start();
     minInvalidRangeEnd = invalidRanges.get(0).end();
+    // Look for open time slots between invalid ranges
     for (int i = 1; i < invalidRanges.size(); i++) {
       if (invalidRanges.get(i).start() > minInvalidRangeEnd) {
         // We've found an open time slot
         validRangeStart = minInvalidRangeEnd;
         validRangeEnd = invalidRanges.get(i).start();
         TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, false);
-        if(validRange.duration() >= duration) {
+        if (validRange.duration() >= duration) {
           results.add(validRange);
         }
         invalidRangeStart = invalidRanges.get(i).start();
@@ -95,7 +96,7 @@ public final class FindMeetingQuery {
     // Add last block of day to results (if long enough)
     if (minInvalidRangeEnd < TimeRange.END_OF_DAY) {
       TimeRange validRange = TimeRange.fromStartEnd(minInvalidRangeEnd, TimeRange.END_OF_DAY, true);
-      if(validRange.duration() >= duration) {
+      if (validRange.duration() >= duration) {
         results.add(validRange);
       }
     }
