@@ -14,7 +14,12 @@
 
 package com.google.sps.servlets;
 
-import com.google.appengine.api.datastore.*;
+import com.google.appengine.api.datastore.DatastoreService;
+import com.google.appengine.api.datastore.DatastoreServiceFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
+import com.google.appengine.api.datastore.Key;
+import com.google.appengine.api.datastore.KeyFactory;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -31,18 +36,16 @@ public class LoginServlet extends HttpServlet {
    * Returns the nickname of the user with id,
    * or empty String if the user is not found in datastore.
    */
-  public static String getUserNickname(String id) {
+  public static String getUserNickname(String id) throws EntityNotFoundException {
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Query query =
-        new Query("UserInfo")
-            .setFilter(new Query.FilterPredicate("id", Query.FilterOperator.EQUAL, id));
-    PreparedQuery results = datastore.prepare(query);
-    Entity entity = results.asSingleEntity();
-    if (entity == null) {
-      return "";
+    Key key = KeyFactory.createKey("UserInfo", id);
+    try {
+      Entity entity = datastore.get(key);
+      String nickname = (String) entity.getProperty("nickname");
+      return nickname;
+    } catch (EntityNotFoundException e) {
+        throw e;
     }
-    String nickname = (String) entity.getProperty("nickname");
-    return nickname;
   }
 
   @Override
@@ -61,8 +64,14 @@ public class LoginServlet extends HttpServlet {
       jsonResponse.addProperty("logoutUrl", logoutUrl);
       User user = userService.getCurrentUser();
       String userId = user.getUserId();
-      jsonResponse.addProperty("nickname", getUserNickname(userId));
       jsonResponse.addProperty("userId", userId);
+      try {
+        String nickname = getUserNickname(userId);
+        jsonResponse.addProperty("nickname", nickname);
+      } catch (EntityNotFoundException e) {
+        e.printStackTrace();
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+      }
     }
 
     response.setContentType("application/json;");

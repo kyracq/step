@@ -17,6 +17,7 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
@@ -30,8 +31,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.sps.data.Comment;
-import com.google.sps.servlets.LoginServlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,7 +96,14 @@ public class DataServlet extends HttpServlet {
 
     UserService userService = UserServiceFactory.getUserService();
     String userId = userService.getCurrentUser().getUserId();
-    String name = LoginServlet.getUserNickname(userId);
+    Entity commentEntity = new Entity("Comment");
+    try {
+      String name = LoginServlet.getUserNickname(userId);
+      commentEntity.setProperty("name", name);
+    } catch (EntityNotFoundException e) {
+        e.printStackTrace();
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
 
     Document commentDocument = Document.newBuilder().setContent(comment)
         .setType(Document.Type.PLAIN_TEXT).build();
@@ -107,8 +113,6 @@ public class DataServlet extends HttpServlet {
     float score = sentiment.getScore();
     languageService.close();
 
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("name", name);
     commentEntity.setProperty("userId", userId);
     commentEntity.setProperty("text", comment);
     commentEntity.setProperty("timestamp", timestamp);
