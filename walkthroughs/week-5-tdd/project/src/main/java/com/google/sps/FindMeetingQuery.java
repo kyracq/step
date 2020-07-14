@@ -22,7 +22,7 @@ public final class FindMeetingQuery {
 
   // Add a time range to Collection results
   private void addRangeToResults(int validRangeStart, int validRangeEnd,
-      boolean inclusive, Collection<TimeRange> results) {
+      boolean inclusive, Collection<TimeRange> results, long duration) {
     TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, inclusive);
     if (validRange.duration() >= duration) {
       results.add(validRange);
@@ -68,8 +68,9 @@ public final class FindMeetingQuery {
 
     // If first event doesn't start at start of day, add time range beginning
     // at start of day
-    if (invalidRanges.get(0).start() != TimeRange.START_OF_DAY) {
-      addRangeToResults(validRangeStart, validRangeEnd, false, results);
+    int firstInvalidRangeStart = invalidRanges.get(0).start();
+    if (firstInvalidRangeStart != TimeRange.START_OF_DAY) {
+      addRangeToResults(TimeRange.START_OF_DAY, firstInvalidRangeStart, false, results, duration);
     }
 
     invalidRangeStart = invalidRanges.get(0).start();
@@ -79,7 +80,7 @@ public final class FindMeetingQuery {
       TimeRange currInvalidRange = invalidRanges.get(i);
       if (currInvalidRange.start() > minInvalidRangeEnd) {
         // We've found an open time slot
-        addRangeToResults(minInvalidRangeEnd, currInvalidRange.start(), false, results);
+        addRangeToResults(minInvalidRangeEnd, currInvalidRange.start(), false, results, duration);
         invalidRangeStart = currInvalidRange.start();
         minInvalidRangeEnd = currInvalidRange.end();
       } else {
@@ -90,7 +91,7 @@ public final class FindMeetingQuery {
 
     // Add last block of day to results (if long enough)
     if (minInvalidRangeEnd < TimeRange.END_OF_DAY) {
-      addRangeToResults(minInvalidRangeEnd, TimeRange.END_OF_DAY, true, results);
+      addRangeToResults(minInvalidRangeEnd, TimeRange.END_OF_DAY, true, results, duration);
     }
 
     return results;
