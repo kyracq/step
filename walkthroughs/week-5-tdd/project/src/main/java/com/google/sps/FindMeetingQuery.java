@@ -48,7 +48,7 @@ public final class FindMeetingQuery {
     ArrayList<TimeRange> invalidRanges = new ArrayList<TimeRange>();
     for (Event event : events) {
       // If there are attendees in common between the request and this event
-      if(!Collections.disjoint(attendees, event.getAttendees())) {
+      if (!Collections.disjoint(attendees, event.getAttendees())) {
         // Requested meeting can't be at same time as this event
         invalidRanges.add(event.getWhen());
       }
