@@ -19,11 +19,16 @@ import java.util.Collection;
 import java.util.Collections;
 
 public final class FindMeetingQuery {
-  /**
-   * Given the currently booked events (time ranges and attendees) and
-   * a meeting request (duration and attendees), return a collection
-   * the of time ranges within which the meeting can be booked.
-   */
+
+  // Add a time range to Collection results
+  private void addRangeToResults(int validRangeStart, int validRangeEnd,
+      boolean inclusive, Collection<TimeRange> results) {
+    TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, inclusive);
+    if (validRange.duration() >= duration) {
+      results.add(validRange);
+    }
+  }
+
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
     Collection<TimeRange> results = new ArrayList<TimeRange>();
     Collection<String> attendees = request.getAttendees();
@@ -64,41 +69,28 @@ public final class FindMeetingQuery {
     // If first event doesn't start at start of day, add time range beginning
     // at start of day
     if (invalidRanges.get(0).start() != TimeRange.START_OF_DAY) {
-      validRangeStart = TimeRange.START_OF_DAY;
-      validRangeEnd = invalidRanges.get(0).start();
-      TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, false);
-      // Add to results if it's long enough
-      if (validRange.duration() >= duration) {
-        results.add(validRange);
-      }
+      addRangeToResults(validRangeStart, validRangeEnd, false, results);
     }
 
     invalidRangeStart = invalidRanges.get(0).start();
     minInvalidRangeEnd = invalidRanges.get(0).end();
     // Look for open time slots between invalid ranges
     for (int i = 1; i < invalidRanges.size(); i++) {
-      if (invalidRanges.get(i).start() > minInvalidRangeEnd) {
+      TimeRange currInvalidRange = invalidRanges.get(i);
+      if (currInvalidRange.start() > minInvalidRangeEnd) {
         // We've found an open time slot
-        validRangeStart = minInvalidRangeEnd;
-        validRangeEnd = invalidRanges.get(i).start();
-        TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, false);
-        if (validRange.duration() >= duration) {
-          results.add(validRange);
-        }
-        invalidRangeStart = invalidRanges.get(i).start();
-        minInvalidRangeEnd = invalidRanges.get(i).end();
+        addRangeToResults(minInvalidRangeEnd, currInvalidRange.start(), false, results);
+        invalidRangeStart = currInvalidRange.start();
+        minInvalidRangeEnd = currInvalidRange.end();
       } else {
         // We definitely won't find a valid range until at least the end of curr invalid range
-        minInvalidRangeEnd = Math.max(invalidRanges.get(i).end(), minInvalidRangeEnd);
+        minInvalidRangeEnd = Math.max(currInvalidRange.end(), minInvalidRangeEnd);
       }
     }
 
     // Add last block of day to results (if long enough)
     if (minInvalidRangeEnd < TimeRange.END_OF_DAY) {
-      TimeRange validRange = TimeRange.fromStartEnd(minInvalidRangeEnd, TimeRange.END_OF_DAY, true);
-      if (validRange.duration() >= duration) {
-        results.add(validRange);
-      }
+      addRangeToResults(minInvalidRangeEnd, TimeRange.END_OF_DAY, true, results);
     }
 
     return results;
