@@ -20,47 +20,19 @@ import java.util.Collections;
 
 public final class FindMeetingQuery {
 
-  // Add a time range to Collection results
-  private void addRangeToResults(int validRangeStart, int validRangeEnd,
-      boolean inclusive, Collection<TimeRange> results, long duration) {
+  // Add a time range to Collection validRanges
+  private void addRange(int validRangeStart, int validRangeEnd,
+      boolean inclusive, Collection<TimeRange> validRanges, long duration) {
     TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, inclusive);
     if (validRange.duration() >= duration) {
-      results.add(validRange);
+      validRanges.add(validRange);
     }
   }
 
-  public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    Collection<TimeRange> results = new ArrayList<TimeRange>();
-    Collection<String> attendees = request.getAttendees();
-    long duration = request.getDuration();
-
-    // Not possible to have an event longer than a full day
-    if (duration > TimeRange.WHOLE_DAY.duration()) {
-      return results;
-    }
-
-    // If no one's attending, there are no conflicts
-    if (attendees.isEmpty()) {
-      results.add(TimeRange.WHOLE_DAY);
-      return results;
-    }
-
-    ArrayList<TimeRange> invalidRanges = new ArrayList<TimeRange>();
-    for (Event event : events) {
-      // If there are attendees in common between the request and this event
-      if (!Collections.disjoint(attendees, event.getAttendees())) {
-        // Requested meeting can't be at same time as this event
-        invalidRanges.add(event.getWhen());
-      }
-    }
-
-    if (invalidRanges.isEmpty()) {
-      results.add(TimeRange.WHOLE_DAY);
-      return results;
-    }
-
-    Collections.sort(invalidRanges, TimeRange.ORDER_BY_START);
-    
+  // Return time ranges that don't conflict with invalidRanges
+  private Collection<TimeRange> getValidRanges(
+      ArrayList<TimeRange> invalidRanges, long duration) {
+    Collection<TimeRange> validRanges = new ArrayList<TimeRange>();
     int invalidRangeStart;
     int minInvalidRangeEnd;
     int validRangeStart;
@@ -70,7 +42,7 @@ public final class FindMeetingQuery {
     // at start of day
     int firstInvalidRangeStart = invalidRanges.get(0).start();
     if (firstInvalidRangeStart != TimeRange.START_OF_DAY) {
-      addRangeToResults(TimeRange.START_OF_DAY, firstInvalidRangeStart, false, results, duration);
+      addRange(TimeRange.START_OF_DAY, firstInvalidRangeStart, false, validRanges, duration);
     }
 
     invalidRangeStart = invalidRanges.get(0).start();
@@ -80,7 +52,7 @@ public final class FindMeetingQuery {
       TimeRange currInvalidRange = invalidRanges.get(i);
       if (currInvalidRange.start() > minInvalidRangeEnd) {
         // We've found an open time slot
-        addRangeToResults(minInvalidRangeEnd, currInvalidRange.start(), false, results, duration);
+        addRange(minInvalidRangeEnd, currInvalidRange.start(), false, validRanges, duration);
         invalidRangeStart = currInvalidRange.start();
         minInvalidRangeEnd = currInvalidRange.end();
       } else {
@@ -89,11 +61,69 @@ public final class FindMeetingQuery {
       }
     }
 
-    // Add last block of day to results (if long enough)
+    // Add last block of day to validRanges (if long enough)
     if (minInvalidRangeEnd < TimeRange.END_OF_DAY) {
-      addRangeToResults(minInvalidRangeEnd, TimeRange.END_OF_DAY, true, results, duration);
+      addRange(minInvalidRangeEnd, TimeRange.END_OF_DAY, true, validRanges, duration);
     }
 
-    return results;
+    return validRanges;
+  }
+
+  public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
+    Collection<TimeRange> validRanges = new ArrayList<TimeRange>();
+    Collection<String> attendees = request.getAttendees();
+    Collection<String> optionalAttendees = request.getOptionalAttendees();
+    long duration = request.getDuration();
+
+    // Not possible to have an event longer than a full day
+    if (duration > TimeRange.WHOLE_DAY.duration()) {
+      return validRanges;
+    }
+
+    if (attendees.isEmpty()) {
+      if (optionalAttendees.isEmpty()) {
+        // If no one's attending, there are no conflicts
+        validRanges.add(TimeRange.WHOLE_DAY);
+        return validRanges; 
+      } else { // All attendees optional
+        attendees = optionalAttendees;
+        optionalAttendees = attendees; // empty set
+      }
+    }
+
+    ArrayList<TimeRange> invalidRanges = new ArrayList<TimeRange>();
+    ArrayList<TimeRange> optionalInvalidRanges = new ArrayList<TimeRange>();
+    for (Event event : events) {
+      // If there are attendees in common between the request and this event
+      if (!Collections.disjoint(attendees, event.getAttendees())) {
+        // Requested meeting can't be at same time as this event
+        invalidRanges.add(event.getWhen());
+      }
+      if (!Collections.disjoint(optionalAttendees, event.getAttendees())) {
+        optionalInvalidRanges.add(event.getWhen());
+      }
+    }
+
+    if (invalidRanges.isEmpty()) {
+      if (optionalInvalidRanges.isEmpty()) {
+        validRanges.add(TimeRange.WHOLE_DAY);
+        return validRanges;
+      } else {
+        invalidRanges = optionalInvalidRanges;
+        optionalInvalidRanges = invalidRanges; // empty
+      }
+    }
+
+    Collections.sort(invalidRanges, TimeRange.ORDER_BY_START);
+    validRanges = getValidRanges(invalidRanges, duration);
+
+    invalidRanges.addAll(optionalInvalidRanges);    
+    Collections.sort(invalidRanges, TimeRange.ORDER_BY_START);
+    Collection<TimeRange> optionalValidRanges = getValidRanges(invalidRanges, duration);
+
+    // If all valid ranges had conflicts with optional attendees,
+    // don't consider optional attendees
+    if (optionalValidRanges.isEmpty()) return validRanges;
+    return optionalValidRanges;
   }
 }
