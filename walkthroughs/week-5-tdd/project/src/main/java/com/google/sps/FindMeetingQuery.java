@@ -20,16 +20,22 @@ import java.util.Collections;
 
 public final class FindMeetingQuery {
 
-  // Add a time range to Collection validRanges
-  private void addRange(int validRangeStart, int validRangeEnd,
+  // Add a time range to validRanges, given the time range
+  // start and end times and whether the time range should include
+  // the endpoints, if it is at least as long as duration.
+  // Return true time range is added, false otherwise.
+  private boolean addRange(int validRangeStart, int validRangeEnd,
       boolean inclusive, Collection<TimeRange> validRanges, long duration) {
     TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, inclusive);
     if (validRange.duration() >= duration) {
       validRanges.add(validRange);
+      return true;
     }
+    return false;
   }
 
-  // Return time ranges that don't conflict with invalidRanges
+  // Return all time ranges don't overlap with any range in
+  // invalidRanges and are at least of length duration.
   private Collection<TimeRange> getValidRanges(
       ArrayList<TimeRange> invalidRanges, long duration) {
     Collection<TimeRange> validRanges = new ArrayList<TimeRange>();
@@ -87,7 +93,7 @@ public final class FindMeetingQuery {
         return validRanges; 
       } else { // All attendees optional
         attendees = optionalAttendees;
-        optionalAttendees = attendees; // empty set
+        optionalAttendees = new ArrayList<String>();
       }
     }
 
@@ -105,12 +111,17 @@ public final class FindMeetingQuery {
     }
 
     if (invalidRanges.isEmpty()) {
+      // If there are no invalid ranges, optional or otherwise
+      // all time ranges are suitable for the meeting
       if (optionalInvalidRanges.isEmpty()) {
         validRanges.add(TimeRange.WHOLE_DAY);
         return validRanges;
       } else {
+        // If there are no invalid ranges but there
+        // are optional invalid ranges, treat the optional
+        // ones are required.
         invalidRanges = optionalInvalidRanges;
-        optionalInvalidRanges = invalidRanges; // empty
+        optionalInvalidRanges = new ArrayList<TimeRange>();
       }
     }
 

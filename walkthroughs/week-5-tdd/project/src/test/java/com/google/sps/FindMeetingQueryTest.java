@@ -325,6 +325,8 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void justEnoughRoomWithBusyOptionalAttendee() {
+    // If there is just enough room for required attendees to attend
+    // and no way for optional attendee to attend, don't consider optional attendee
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0830AM, false),
             Arrays.asList(PERSON_A)),
@@ -345,6 +347,7 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void allAttendeesOptional() {
+    // When all attendees are optional, treat them as required
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartDuration(TIME_0800AM, DURATION_30_MINUTES),
             Arrays.asList(PERSON_A)),
@@ -366,6 +369,7 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void allAttendeesOptionalAndNoRoom() {
+    // All attendees optional but no possible time slot
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0830AM, false),
             Arrays.asList(PERSON_A)),
@@ -384,6 +388,8 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void justEnoughRoomOptionalAttendeeAvailable() {
+    // If there is just room for optional attendee to make it, only return
+    // time ranges when optional attendee is free.
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0830AM, false),
             Arrays.asList(PERSON_A)),
@@ -402,6 +408,9 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void optionalAttendeeCanAttendInFistHalfOfValidRange() {
+    // If optional attendee is only free in the first portion of the only
+    // time range that all required attendees are free, only return the
+    // first portion of that range.
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0800AM, false),
             Arrays.asList(PERSON_A)),
@@ -422,6 +431,9 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void optionalAttendeeCanAttendInLatterHalfOfValidRange() {
+    // If optional attendee is only free in the latter portion of the only
+    // time range that all required attendees are free, only return the
+    // latter portion of that range.
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartEnd(TimeRange.START_OF_DAY, TIME_0800AM, false),
             Arrays.asList(PERSON_A)),
@@ -442,6 +454,9 @@ public final class FindMeetingQueryTest {
 
   @Test
   public void complexSchedules() {
+    // There are several conflicts, but it is possible for the optional
+    // attendee to make it, only return time range when optional attendee
+    // is free.
     Collection<Event> events = Arrays.asList(
         new Event("Event 1", TimeRange.fromStartDuration(TIME_0800AM, DURATION_60_MINUTES),
             Arrays.asList(PERSON_A)),
