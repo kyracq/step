@@ -14,10 +14,127 @@
 
 package com.google.sps;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public final class FindMeetingQuery {
+
+  // Add a time range to validRanges, given the time range
+  // start and end times and whether the time range should include
+  // the endpoints, if it is at least as long as duration.
+  // Return true time range is added, false otherwise.
+  private boolean addRange(int validRangeStart, int validRangeEnd,
+      boolean inclusive, Collection<TimeRange> validRanges, long duration) {
+    TimeRange validRange = TimeRange.fromStartEnd(validRangeStart, validRangeEnd, inclusive);
+    if (validRange.duration() >= duration) {
+      validRanges.add(validRange);
+      return true;
+    }
+    return false;
+  }
+
+  // Return all time ranges don't overlap with any range in
+  // invalidRanges and are at least of length duration.
+  private Collection<TimeRange> getValidRanges(
+      ArrayList<TimeRange> invalidRanges, long duration) {
+    Collection<TimeRange> validRanges = new ArrayList<TimeRange>();
+    int invalidRangeStart;
+    int minInvalidRangeEnd;
+    int validRangeStart;
+    int validRangeEnd;
+
+    // If first event doesn't start at start of day, add time range beginning
+    // at start of day
+    int firstInvalidRangeStart = invalidRanges.get(0).start();
+    if (firstInvalidRangeStart != TimeRange.START_OF_DAY) {
+      addRange(TimeRange.START_OF_DAY, firstInvalidRangeStart, false, validRanges, duration);
+    }
+
+    invalidRangeStart = invalidRanges.get(0).start();
+    minInvalidRangeEnd = invalidRanges.get(0).end();
+    // Look for open time slots between invalid ranges
+    for (int i = 1; i < invalidRanges.size(); i++) {
+      TimeRange currInvalidRange = invalidRanges.get(i);
+      if (currInvalidRange.start() > minInvalidRangeEnd) {
+        // We've found an open time slot
+        addRange(minInvalidRangeEnd, currInvalidRange.start(), false, validRanges, duration);
+        invalidRangeStart = currInvalidRange.start();
+        minInvalidRangeEnd = currInvalidRange.end();
+      } else {
+        // We definitely won't find a valid range until at least the end of curr invalid range
+        minInvalidRangeEnd = Math.max(currInvalidRange.end(), minInvalidRangeEnd);
+      }
+    }
+
+    // Add last block of day to validRanges (if long enough)
+    if (minInvalidRangeEnd < TimeRange.END_OF_DAY) {
+      addRange(minInvalidRangeEnd, TimeRange.END_OF_DAY, true, validRanges, duration);
+    }
+
+    return validRanges;
+  }
+
   public Collection<TimeRange> query(Collection<Event> events, MeetingRequest request) {
-    throw new UnsupportedOperationException("TODO: Implement this method.");
+    Collection<TimeRange> validRanges = new ArrayList<TimeRange>();
+    Collection<String> attendees = request.getAttendees();
+    Collection<String> optionalAttendees = request.getOptionalAttendees();
+    long duration = request.getDuration();
+
+    // Not possible to have an event longer than a full day
+    if (duration > TimeRange.WHOLE_DAY.duration()) {
+      return validRanges;
+    }
+
+    if (attendees.isEmpty()) {
+      if (optionalAttendees.isEmpty()) {
+        // If no one's attending, there are no conflicts
+        validRanges.add(TimeRange.WHOLE_DAY);
+        return validRanges; 
+      } else { // All attendees optional
+        attendees = optionalAttendees;
+        optionalAttendees = new ArrayList<String>();
+      }
+    }
+
+    ArrayList<TimeRange> invalidRanges = new ArrayList<TimeRange>();
+    ArrayList<TimeRange> optionalInvalidRanges = new ArrayList<TimeRange>();
+    for (Event event : events) {
+      // If there are attendees in common between the request and this event
+      if (!Collections.disjoint(attendees, event.getAttendees())) {
+        // Requested meeting can't be at same time as this event
+        invalidRanges.add(event.getWhen());
+      }
+      if (!Collections.disjoint(optionalAttendees, event.getAttendees())) {
+        optionalInvalidRanges.add(event.getWhen());
+      }
+    }
+
+    if (invalidRanges.isEmpty()) {
+      // If there are no invalid ranges, optional or otherwise
+      // all time ranges are suitable for the meeting
+      if (optionalInvalidRanges.isEmpty()) {
+        validRanges.add(TimeRange.WHOLE_DAY);
+        return validRanges;
+      } else {
+        // If there are no invalid ranges but there
+        // are optional invalid ranges, treat the optional
+        // ones are required.
+        invalidRanges = optionalInvalidRanges;
+        optionalInvalidRanges = new ArrayList<TimeRange>();
+      }
+    }
+
+    Collections.sort(invalidRanges, TimeRange.ORDER_BY_START);
+    validRanges = getValidRanges(invalidRanges, duration);
+
+    invalidRanges.addAll(optionalInvalidRanges);    
+    Collections.sort(invalidRanges, TimeRange.ORDER_BY_START);
+    Collection<TimeRange> optionalValidRanges = getValidRanges(invalidRanges, duration);
+
+    // If all valid ranges had conflicts with optional attendees,
+    // don't consider optional attendees
+    if (optionalValidRanges.isEmpty()) return validRanges;
+    return optionalValidRanges;
   }
 }

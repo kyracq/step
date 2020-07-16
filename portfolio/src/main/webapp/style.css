@@ -34,6 +34,21 @@ p {
   font-family: 'Open Sans', sans-serif;
 }
 
+/* Login status */
+
+#login-status {
+  background-color: white;
+  column-gap: 5px;
+  display: grid;
+  grid-template-columns: auto auto;
+  padding: 10px;
+  position: fixed;
+  right: 0;
+  top: 0;
+}
+
+/* Navbar */
+
 .navbar {
   background-color: var(--bg-primary);
   height: 100vh; /* 100% of window height */
@@ -46,6 +61,35 @@ p {
 /* Expand on hover */
 .navbar:hover {
   width: 16rem;
+}
+
+.nav-link {
+  align-items: center;
+  color: var(--text-primary);
+  display: flex;
+  filter: grayscale(100%) opacity(.7);
+  height: 5rem;
+  text-decoration: none;
+  transition: var(--transition-speed);
+}
+
+.nav-link:hover {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  filter: grayscale(0%) opacity(1);
+}
+
+/* Format icons */
+.nav-link i {
+  color: var(--accent-color);
+  font-size: 36px;
+  margin: 0 1.5rem;
+}
+
+/* Only show icons, not text */
+.link-text {
+  display: none;
+  margin-left: 1rem;
 }
 
 /* Show text on hover */
@@ -67,6 +111,8 @@ p {
   width: 100%;
 }
 
+/* Navbar: change color buttons */
+
 .color-buttons {
   margin-top: auto;
   width: 100%;
@@ -75,22 +121,6 @@ p {
 .color-buttons i {
   font-size: 36px;
   margin: 0 1.5rem;
-}
-
-.nav-link {
-  align-items: center;
-  color: var(--text-primary);
-  display: flex;
-  filter: grayscale(100%) opacity(.7);
-  height: 5rem;
-  text-decoration: none;
-  transition: var(--transition-speed);
-}
-
-.nav-link:hover {
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  filter: grayscale(0%) opacity(1);
 }
 
 #paint .nav-link:hover {
@@ -132,18 +162,7 @@ p {
   color: var(--purple)
 }
 
-/* Only show icons, not text */
-.link-text {
-  display: none;
-  margin-left: 1rem;
-}
-
-/* Format icons */
-.nav-link i {
-  color: var(--accent-color);
-  font-size: 36px;
-  margin: 0 1.5rem;
-}
+/* Intro/Welcome section */
 
 .intro {
   margin: 0 100px 0 100px;
@@ -167,6 +186,8 @@ p {
   font: normal 20px 'Open Sans', sans-serif;
   margin: 0 0 0 0;
 }
+
+/* Site content sections */
 
 .section-wrapper {
   color: var(--bg-primary);
@@ -208,16 +229,7 @@ h1:after {
   display: none;
 }
 
-#comments-header {
-  border-top: 1px solid var(--accent-color);
-  padding-top: 20px;
-  text-align: left;
-}
-
-#comments-header:before,
-#comments-header:after {
-  display: none;
-}
+/* Site content sections: About me */
 
 .aboutme-content {
   display: grid;
@@ -262,6 +274,8 @@ h1:after {
   padding: 10px;
 }
 
+/* Site content sections: Experience */
+
 .experience-content {
   align-items: center;
   display: grid;
@@ -275,6 +289,8 @@ h1:after {
 #summary {
   padding: 0 20px 0 20px;
 }
+
+/* Buttons */
 
 input[type=submit],
 .btn {
@@ -319,15 +335,17 @@ input[type=submit]:hover,
   color: black;
 }
 
-#login-status {
-  background-color: white;
-  column-gap: 5px;
-  display: grid;
-  grid-template-columns: auto auto;
-  padding: 10px;
-  position: fixed;
-  right: 0;
-  top: 0;
+/* Site content sections: Comments */
+
+#comments-header {
+  border-top: 1px solid var(--accent-color);
+  padding-top: 20px;
+  text-align: left;
+}
+
+#comments-header:before,
+#comments-header:after {
+  display: none;
 }
 
 .comment-width-wrapper {
@@ -346,6 +364,11 @@ input[type=submit]:hover,
 
 #comment-form {
   display: none;
+}
+
+textarea,
+input {
+  font-family: 'Open Sans', sans-serif;
 }
 
 #comments-container {
@@ -374,6 +397,19 @@ input[type=submit]:hover,
   font-weight: bolder;
 }
 
+.sentiment-icon {
+  align-items: center;
+  display: flex;
+}
+
+.sentiment-icon .material-icons{
+  font-size: 40px;
+}
+
+.sentiment-icon a:visited {
+  color: black;
+}
+
 .delete-btn-wrapper {
   width: 10%;
 }
@@ -389,23 +425,7 @@ input[type=submit]:hover,
   outline: none;
 }
 
-.sentiment-icon {
-  align-items: center;
-  display: flex;
-}
-
-.sentiment-icon .material-icons{
-  font-size: 40px;
-}
-
-.sentiment-icon a:visited {
-  color: black;
-}
-
-textarea,
-input {
-  font-family: 'Open Sans', sans-serif;
-}
+/* Footer */
 
 footer {
   background-color: var(--accent-color);
