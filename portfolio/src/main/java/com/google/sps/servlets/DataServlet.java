@@ -17,10 +17,13 @@ package com.google.sps.servlets;
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
 import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.appengine.api.datastore.FetchOptions;
 import com.google.appengine.api.datastore.PreparedQuery;
 import com.google.appengine.api.datastore.Query;
 import com.google.appengine.api.datastore.Query.SortDirection;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import com.google.cloud.language.v1.Document;
 import com.google.cloud.language.v1.LanguageServiceClient;
 import com.google.cloud.language.v1.Sentiment;
@@ -28,7 +31,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.sps.data.Comment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,11 +52,12 @@ public class DataServlet extends HttpServlet {
     for (Entity entity : results.asIterable(FetchOptions.Builder.withLimit(maxComments))) {
       long id = entity.getKey().getId();
       String name = (String) entity.getProperty("name");
+      String userId = (String) entity.getProperty("userId");
       String text = (String) entity.getProperty("text");
       long timestamp = (long) entity.getProperty("timestamp");
       double sentimentScore = (double) entity.getProperty("sentimentScore");
 
-      Comment comment = new Comment(id, name, text, timestamp, sentimentScore);
+      Comment comment = new Comment(id, name, userId, text, timestamp, sentimentScore);
       comments.add(comment);
     }
     return comments;
@@ -89,8 +92,18 @@ public class DataServlet extends HttpServlet {
 
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     String comment = request.getParameter("comment-input");
-    String name = request.getParameter("name-input");
     long timestamp = System.currentTimeMillis();
+
+    UserService userService = UserServiceFactory.getUserService();
+    String userId = userService.getCurrentUser().getUserId();
+    Entity commentEntity = new Entity("Comment");
+    try {
+      String name = LoginServlet.getUserNickname(userId);
+      commentEntity.setProperty("name", name);
+    } catch (EntityNotFoundException e) {
+        e.printStackTrace();
+        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+    }
 
     Document commentDocument = Document.newBuilder().setContent(comment)
         .setType(Document.Type.PLAIN_TEXT).build();
@@ -100,8 +113,7 @@ public class DataServlet extends HttpServlet {
     float score = sentiment.getScore();
     languageService.close();
 
-    Entity commentEntity = new Entity("Comment");
-    commentEntity.setProperty("name", name);
+    commentEntity.setProperty("userId", userId);
     commentEntity.setProperty("text", comment);
     commentEntity.setProperty("timestamp", timestamp);
     commentEntity.setProperty("sentimentScore", score);

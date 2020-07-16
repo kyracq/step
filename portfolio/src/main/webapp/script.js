@@ -136,16 +136,17 @@ function getComments() {
   fetch(`/comments?max-comments=${maxComments}`)
     .then(response => response.json().then(data =>
       ({ data: data, success: response.ok })))
-    .then((response) => {
+    .then(async (response) => {
       const commentsContainer = document.getElementById('comments-container');
       while (commentsContainer.firstChild) { /* Remove old comments */
         commentsContainer.removeChild(commentsContainer.firstChild);
       }
       if (response.success === true) {
         const comments = response.data.comments;
+        const loginStatus = await getLoginStatus();
         if (comments != null) {
           comments.forEach((comment) => {
-            const commentHtml = getCommentHtml(comment);
+            const commentHtml = getCommentHtml(comment, loginStatus.userId);
             const commentElement = document.createElement('div');
             commentElement.innerHTML = commentHtml;
             commentsContainer.appendChild(commentElement);
@@ -178,27 +179,46 @@ function getIcon(sentimentScore) {
 }
 
 /**
- * Create element that represents a comment.
+ * Create element that represents a comment. Show option to delete comment
+ * if the logged in user made the comment.
  */
-function getCommentHtml(comment) {
+function getCommentHtml(comment, userId) {
   const tooltipUrl = 'https://cloud.google.com/natural-language/docs/basics' +
-      '#interpreting_sentiment_analysis_values';
+    '#interpreting_sentiment_analysis_values';
+  
+  /* Show delete button if it's the user's comment. */
+  let deleteButton = '';
+  if (comment.userId === userId) {
+    deleteButton = 
+        `<button class="delete-btn" onClick="deleteComment(${comment.id})">
+          <span class="material-icons">delete</span>
+        </button>`;
+  }
+
+  const sentimentIconTitle = 'Sentiment score: ' + 
+      comment.sentimentScore.toFixed(2) + '. Click to learn more.';
 
   const html =
       `<li>
-        <div class="comment">
-          <div>
-            <div class="comment-name">${comment.name}</div>
-            <div class="comment-text">${comment.text}</div>
-            <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
+        <div class="comment-content-wrapper">
+          <div class="comment">
+            <div class="comment-content">
+              <div class="comment-name">${comment.name}</div>
+              <div class="comment-text">${comment.text}</div>
+              <div class="comment-time">${parseTimestamp(comment.timestamp)}</div>
+            </div>
+            <div class="sentiment-icon">
+              <a href="${tooltipUrl}" target="_blank">
+                <span class="material-icons"
+                title="${sentimentIconTitle}">
+                ${getIcon(comment.sentimentScore)}
+                </span>
+              </a>
+            </div>
           </div>
-          <div class="sentiment-icon">
-            <span class="material-icons"
-            title="Sentiment score: ${comment.sentimentScore.toFixed(2)}">
-            ${getIcon(comment.sentimentScore)}
-            </span>
-            <a href="${tooltipUrl}" target="_blank" class="more-info">?</a>
-          </div>
+        </div>
+        <div class="delete-btn-wrapper">
+          ${deleteButton}
         </div>
       </li>`;
 
@@ -206,13 +226,87 @@ function getCommentHtml(comment) {
 }
 
 /**
- * Delete all comments from datastore.
+ * Delete comment with id from datastore
  */
-function deleteAllComments() {
-  if (confirm('Are you sure you want to delete all comments, ' +
-    'including those from other users?')) {
-    fetch('/delete-data', {
+function deleteComment(id) {
+  if (confirm('Are you sure you want to permanently delete this comment?')) {
+    fetch(`/delete-comment?id=${id}`, {
       method: 'POST',
-    }).then(getComments());
+    }).then(() => {
+      getComments();
+    });
   }
+}
+
+/**
+ * Check if user is logged in a display login status.
+ */
+async function getLoginStatus() {
+  const response = await fetch('/login');
+  const loginStatus = await response.json();
+  return loginStatus;
+}
+
+/**
+ * Set HTML content according to whether user is logged in.
+ */
+function displayLoginStatus(loginStatus) {
+  const loginStatusElement = document.getElementById('login-status');
+  const commentForm = document.getElementById('comment-form');
+  const commentMessage = document.getElementById('comment-msg');
+
+  if (loginStatus.loggedIn) {
+    loginStatusElement.innerHTML =
+      `<div>Hello, ${loginStatus.nickname}!</div>
+      <a href=${loginStatus.logoutUrl}>Log out</a>`;
+    commentForm.style.display = 'block';
+    commentMessage.display = 'none';
+  }
+  else {
+    const loginLink = `<a href=${loginStatus.loginUrl}>Log in</a>`
+    loginStatusElement.innerHTML = loginLink;
+    commentMessage.innerHTML = `${loginLink} to leave a comment.`;
+  }
+}
+
+async function getAndDisplayLoginStatus() {
+  const loginStatus = await getLoginStatus();
+  displayLoginStatus(loginStatus);
+}
+
+/**
+ * Set logged in user's nickname if they don't have one set.
+ */
+function setUserNickname() {
+  /* Check if user has already set a nickname */
+  fetch('/login')
+    .then(response => response.json())
+    .then((response) => {
+      /* If nickname is a non-empty string, redirect to main page */
+      if (response.nickname != undefined && response.nickname.length != 0) {
+        window.location.replace("/");
+      }
+      /* If no nickname set, prompt for a nickname and save to datastore */
+      else {
+        let nickname = prompt('Enter a nickname to be displayed when you ' +
+          'leave a comment.');
+        const alphaExp = /^[a-zA-Z]+$/; /* Regex for only letters */
+        /* Only allow non-empty string inputs */
+        if (nickname == null || nickname == "") {
+          alert("Please enter a nickname.");
+          location.reload(); /* Refresh which will re-prompt */
+          return;
+        }
+        /* Only allow inputs that contain only letters */
+        else if (!alphaExp.test(nickname)) {
+          alert("Nickname must contain letters only.")
+          location.reload();
+          return;
+        }
+
+        fetch(`/nickname?nickname=${nickname}`, {
+          method: 'POST',
+        }).then(window.location.replace("/"));
+      }
+    });
 }

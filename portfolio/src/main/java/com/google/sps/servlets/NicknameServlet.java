@@ -16,28 +16,28 @@ package com.google.sps.servlets;
 
 import com.google.appengine.api.datastore.DatastoreService;
 import com.google.appengine.api.datastore.DatastoreServiceFactory;
-import com.google.appengine.api.datastore.Key;
-import com.google.appengine.api.datastore.KeyFactory;
+import com.google.appengine.api.datastore.Entity;
+import com.google.appengine.api.users.UserService;
+import com.google.appengine.api.users.UserServiceFactory;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-/** Servlet responsible for deleting comments. */
-@WebServlet("/delete-comment")
-public class DeleteCommentServlet extends HttpServlet {
+@WebServlet("/nickname")
+public class NicknameServlet extends HttpServlet {
 
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    long id = Long.parseLong(request.getParameter("id"));
+    UserService userService = UserServiceFactory.getUserService();
+
+    String nickname = request.getParameter("nickname");
+    String id = userService.getCurrentUser().getUserId();
+
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Key key = KeyFactory.createKey("Comment", id);
-    try {
-      datastore.delete(key);
-    } catch (IllegalArgumentException e) {
-      e.printStackTrace();
-      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-    }
+    Entity entity = new Entity("UserInfo", id);
+    entity.setProperty("nickname", nickname);
+    datastore.put(entity);
   }
 }
